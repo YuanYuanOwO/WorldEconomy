@@ -1,0 +1,18 @@
+name: WorldEconomy
+description: A highly simplistic, Vault-based economy provider, supporting per-world balances and world-groups.
+main: me.blvckbytes.world_economy.WorldEconomyPlugin
+version: ${project.version}
+author: BlvckBytes
+api-version: 1.13
+depend: [Vault]
+commands:
+  bal:
+    description: 'Retrieve the current balances of yourself and others'
+  baltop:
+    description: 'Display the first N players for any given world, owning the highest balances'
+  money:
+    description: 'An administrative tool to update the balances of any given player'
+  pay:
+    description: 'Pay a positive amount of money to another player'
+  wereload:
+    description: 'Reload the configuration-file'
