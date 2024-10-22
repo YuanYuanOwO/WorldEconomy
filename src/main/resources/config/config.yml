@@ -29,6 +29,14 @@ commands:
     aliases:
       - worldeconomyreload
 
+worldGroups:
+  world:
+    displayName: '&6World'
+    members:
+      - world
+      - world_nether
+      - world_the_end
+
 playerMessages:
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'

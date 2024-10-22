@@ -1,0 +1,65 @@
+package me.blvckbytes.world_economy;
+
+import me.blvckbytes.bukkitevaluable.ConfigKeeper;
+import me.blvckbytes.world_economy.config.MainSection;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+public class WorldGroupRegistry {
+
+  private final Logger logger;
+  private final ConfigKeeper<MainSection> config;
+  private final Map<String, WorldGroup> worldGroupByIdentifierNameLower;
+  private final Map<String, WorldGroup> worldGroupByMemberNameLower;
+
+  public WorldGroupRegistry(
+    ConfigKeeper<MainSection> config,
+    Logger logger
+  ) {
+    this.config = config;
+    this.logger = logger;
+    this.worldGroupByIdentifierNameLower = new HashMap<>();
+    this.worldGroupByMemberNameLower = new HashMap<>();
+
+    this.config.registerReloadListener(this::loadFromConfig);
+    this.loadFromConfig();
+  }
+
+  public @Nullable WorldGroup getWorldGroupByMemberNameIgnoreCase(String memberName) {
+    return worldGroupByMemberNameLower.get(memberName.toLowerCase());
+  }
+
+  public @Nullable WorldGroup getWorldGroupByIdentifierNameIgnoreCase(String identifierName) {
+    return worldGroupByIdentifierNameLower.get(identifierName.toLowerCase());
+  }
+
+  private void loadFromConfig() {
+    this.worldGroupByIdentifierNameLower.clear();
+    this.worldGroupByMemberNameLower.clear();
+
+    for (var worldGroupEntry : this.config.rootSection.worldGroups.worldGroups.entrySet()) {
+      var identifierNameLower = worldGroupEntry.getKey().toLowerCase();
+      var groupDataSection = worldGroupEntry.getValue();
+
+      var worldGroup = new WorldGroup(
+        identifierNameLower,
+        groupDataSection.displayName,
+        groupDataSection.members
+          .stream()
+          .map(String::toLowerCase)
+          .collect(Collectors.toSet())
+      );
+
+      worldGroupByIdentifierNameLower.put(identifierNameLower, worldGroup);
+
+      for (var memberNameLower : worldGroup.memberWorldNamesLower())
+        worldGroupByMemberNameLower.put(memberNameLower, worldGroup);
+    }
+
+    logger.info("Loaded " + worldGroupByIdentifierNameLower.size() + " world-groups");
+  }
+}

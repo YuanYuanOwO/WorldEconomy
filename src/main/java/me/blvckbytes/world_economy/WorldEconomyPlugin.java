@@ -26,11 +26,13 @@ public class WorldEconomyPlugin extends JavaPlugin {
       var configManager = new ConfigManager(this, "config");
       var config = new ConfigKeeper<>(configManager, "config.yml", MainSection.class);
 
+      var worldGroupRegistry = new WorldGroupRegistry(config, logger);
+
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand()),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand()),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),
-        new Tuple<>(config.rootSection.commands.pay, new PayCommand()),
+        new Tuple<>(config.rootSection.commands.pay, new PayCommand(worldGroupRegistry)),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {
