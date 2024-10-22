@@ -31,7 +31,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand()),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),
         new Tuple<>(config.rootSection.commands.pay, new PayCommand()),
-        new Tuple<>(config.rootSection.commands.reload, new ReloadCommand())
+        new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Could not initialize plugin", e);

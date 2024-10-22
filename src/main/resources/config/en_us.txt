@@ -1,0 +1,13 @@
+# ==================== BEGIN Messages ====================
+
+MESSAGE-PREFIX                              &7[&6WorldEconomy&7]
+
+# - prefix: String
+MESSAGE-PLUGIN-RELOAD                       {prefix} &7The plugin has been &ereloaded &7successfully.
+# - prefix: String
+MESSAGE-PLUGIN-RELOAD-ERROR                 {prefix} &cAn error occurred while trying to reload the plugin. Check the console!
+
+# - prefix: String
+MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND               {prefix} &cYou don't have permission to use the reload-command.
+
+# ==================== END Messages ====================

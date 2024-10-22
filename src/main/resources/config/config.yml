@@ -30,5 +30,9 @@ commands:
       - worldeconomyreload
 
 playerMessages:
+  pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
+  pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionReloadCommand$: '@{MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
 
 lut:
+  MESSAGE_PREFIX: '@{MESSAGE-PREFIX}'
