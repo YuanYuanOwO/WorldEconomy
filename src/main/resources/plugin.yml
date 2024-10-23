@@ -8,6 +8,8 @@ depend: [Vault, NBTAPI]
 commands:
   bal:
     description: 'Retrieve the current balances of yourself and others'
+  bals:
+    description: 'Retrieve the current balances of all worlds of yourself and others'
   baltop:
     description: 'Display the first N players for any given world, owning the highest balances'
   money:

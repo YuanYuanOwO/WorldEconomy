@@ -1,19 +1,14 @@
 package me.blvckbytes.world_economy;
 
-import org.bukkit.OfflinePlayer;
-
 public class EconomyAccount {
 
-  public final OfflinePlayer holder;
   private double balance;
   private final BalanceConstraint balanceConstraint;
 
   public EconomyAccount(
-    OfflinePlayer holder,
     double balance,
     BalanceConstraint balanceConstraint
   ) {
-    this.holder = holder;
     this.balance = balance;
     this.balanceConstraint = balanceConstraint;
   }

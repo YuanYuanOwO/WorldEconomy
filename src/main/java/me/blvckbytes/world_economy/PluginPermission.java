@@ -3,7 +3,9 @@ package me.blvckbytes.world_economy;
 import org.bukkit.entity.Player;
 
 public enum PluginPermission {
-  RELOAD_COMMAND("command.reload"),
+  COMMAND_RELOAD("command.reload"),
+  COMMAND_BALANCES("command.balances"),
+  COMMAND_BALANCES_OTHER("command.balances.other"),
   ;
 
   private static final String PREFIX = "worldeconomy";

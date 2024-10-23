@@ -4,8 +4,7 @@ import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -29,12 +28,16 @@ public class WorldGroupRegistry {
     this.loadFromConfig();
   }
 
+  public Collection<WorldGroup> getWorldGroups() {
+    return Collections.unmodifiableCollection(worldGroupByIdentifierNameLower.values());
+  }
+
   public @Nullable WorldGroup getWorldGroupByMemberNameIgnoreCase(String memberName) {
-    return worldGroupByMemberNameLower.get(memberName.toLowerCase());
+    return worldGroupByMemberNameLower.get(memberName.toLowerCase().trim());
   }
 
   public @Nullable WorldGroup getWorldGroupByIdentifierNameIgnoreCase(String identifierName) {
-    return worldGroupByIdentifierNameLower.get(identifierName.toLowerCase());
+    return worldGroupByIdentifierNameLower.get(identifierName.toLowerCase().trim());
   }
 
   private void loadFromConfig() {

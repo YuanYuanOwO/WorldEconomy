@@ -17,6 +17,7 @@ public class EconomySection extends AConfigSection {
   public @Nullable Double maxMoney;
   public @Nullable Double minMoney;
   public @Nullable Double minPayAmount;
+  public boolean doClampOnLoad;
 
   @CSAlways
   public NumberFormatSection currencyFormat;

@@ -28,6 +28,10 @@ commands:
     name: wereload
     aliases:
       - worldeconomyreload
+  balances:
+    name: bals
+    aliases:
+      - balances
 
 worldGroups:
   world:
@@ -45,6 +49,8 @@ economy:
   maxMoney: null
   # Set to null for no lower bound
   minMoney: -1000.0
+  # Whether to clamp existing accounts to the [min;max]-interval as specified above when loading them
+  doClampOnLoad: true
   # Set to null for no lower bound
   minPayAmount: .001
 

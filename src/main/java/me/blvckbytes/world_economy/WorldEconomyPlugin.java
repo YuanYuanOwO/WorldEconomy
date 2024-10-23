@@ -20,7 +20,10 @@ import java.util.logging.Level;
 
 public class WorldEconomyPlugin extends JavaPlugin {
 
+  // TODO: Make use of the world-group registry to coalesce world-access
+
   private @Nullable WorldEconomyProvider provider;
+  private @Nullable EconomyDataRegistry accountRegistry;
 
   @Override
   public void onEnable() {
@@ -38,15 +41,17 @@ public class WorldEconomyPlugin extends JavaPlugin {
       var offlineLocationReader = new OfflineLocationReader(worldGroupRegistry, config, logger);
       Bukkit.getServer().getPluginManager().registerEvents(offlineLocationReader, this);
 
-      var accountRegistry = new EconomyAccountRegistry(offlineLocationReader, config, logger);
+      accountRegistry = new EconomyDataRegistry(this, offlineLocationReader, worldGroupRegistry, config, logger);
+      Bukkit.getServer().getPluginManager().registerEvents(accountRegistry, this);
 
       registerProvider(new WorldEconomyProvider(this, config, accountRegistry));
 
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand()),
+        new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(accountRegistry, provider, worldGroupRegistry)),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand()),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),
-        new Tuple<>(config.rootSection.commands.pay, new PayCommand(worldGroupRegistry, offlineLocationReader)),
+        new Tuple<>(config.rootSection.commands.pay, new PayCommand()),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {
@@ -61,6 +66,11 @@ public class WorldEconomyPlugin extends JavaPlugin {
       unregisterProvider();
     } catch (Exception e) {
       getLogger().log(Level.SEVERE, "Could not unregister economy-provider", e);
+    }
+
+    if (accountRegistry != null) {
+      accountRegistry.writeAndClearCache();
+      accountRegistry = null;
     }
   }
 

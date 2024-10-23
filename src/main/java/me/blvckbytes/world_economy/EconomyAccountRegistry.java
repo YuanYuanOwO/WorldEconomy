@@ -3,64 +3,47 @@ package me.blvckbytes.world_economy;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.OfflinePlayer;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.logging.Logger;
+import java.util.*;
 
-public class EconomyAccountRegistry implements BalanceConstraint {
+public class EconomyAccountRegistry {
 
-  // TODO: Extensively log on WARNING-level when encountering unexpected state
-  // TODO: Log API-calls on DEBUG-level
-  // TODO: Add a doClamp boolean to the config which decides whether to clamp balance to [min;max] on load
-
-  private final OfflineLocationReader offlineLocationReader;
+  private final OfflinePlayer holder;
+  private final Map<WorldGroup, EconomyAccount> accountByWorldGroup;
   private final ConfigKeeper<MainSection> config;
-  private final Logger logger;
+  private final BalanceConstraint balanceConstraint;
 
   public EconomyAccountRegistry(
-    OfflineLocationReader offlineLocationReader,
+    OfflinePlayer holder,
+    Map<WorldGroup, EconomyAccount> accountByWorldGroup,
     ConfigKeeper<MainSection> config,
-    Logger logger
+    BalanceConstraint balanceConstraint
   ) {
-    this.offlineLocationReader = offlineLocationReader;
+    this.holder = holder;
+    this.accountByWorldGroup = accountByWorldGroup;
     this.config = config;
-    this.logger = logger;
+    this.balanceConstraint = balanceConstraint;
   }
 
-  public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
-    var worldName = offlineLocationReader.getLocationWorldName(player);
-    return worldName == null ? null : getForWorldName(player, worldName);
+  public OfflinePlayer getHolder() {
+    return holder;
   }
 
-  public boolean createForLastWorld(OfflinePlayer player) {
-    var worldName = offlineLocationReader.getLocationWorldName(player);
-    return worldName != null && createForWorldName(player, worldName);
+  public EconomyAccount getAccount(WorldGroup worldGroup) {
+    return accountByWorldGroup.computeIfAbsent(worldGroup, key -> (
+      new EconomyAccount(config.rootSection.economy.startingBalance, balanceConstraint)
+    ));
   }
 
-  public @Nullable EconomyAccount getForWorldName(OfflinePlayer player, String worldName) {
-    // TODO: Implement
-    return new EconomyAccount(player, 0, this);
-  }
+  public Map<String, Double> toScalarMap() {
+    var result = new HashMap<String, Double>();
 
-  public boolean createForWorldName(OfflinePlayer player, String worldName) {
-    // TODO: Implement
-    return true;
-  }
-
-  @Override
-  public boolean isWithinRange(EconomyAccount account, double balance) {
-    Double constraint;
-
-    if ((constraint = config.rootSection.economy.minMoney) != null) {
-      if (balance < constraint)
-        return false;
+    for (var entry : accountByWorldGroup.entrySet()) {
+      var worldGroupIdentifier = entry.getKey().identifierNameLower();
+      var accountBalance = entry.getValue().getBalance();
+      result.put(worldGroupIdentifier, accountBalance);
     }
 
-    if ((constraint = config.rootSection.economy.maxMoney) != null) {
-      if (balance > constraint)
-        return false;
-    }
-
-    return true;
+    return result;
   }
 }

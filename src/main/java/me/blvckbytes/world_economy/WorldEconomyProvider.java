@@ -23,12 +23,12 @@ public class WorldEconomyProvider implements Economy {
 
   private final Plugin plugin;
   private final ConfigKeeper<MainSection> config;
-  private final EconomyAccountRegistry accountRegistry;
+  private final EconomyDataRegistry accountRegistry;
 
   public WorldEconomyProvider(
     Plugin plugin,
     ConfigKeeper<MainSection> config,
-    EconomyAccountRegistry accountRegistry
+    EconomyDataRegistry accountRegistry
   ) {
     this.plugin = plugin;
     this.config = config;
