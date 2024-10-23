@@ -37,10 +37,6 @@ worldGroups:
       - world_nether
       - world_the_end
 
-# Used when the world stored for an offline-player is not a known world
-# Set to null in order to result in a transaction failure down the line
-fallbackOfflinePlayerWorld: world
-
 economy:
   nameSingular: 'Euro'
   namePlural: 'Euros'

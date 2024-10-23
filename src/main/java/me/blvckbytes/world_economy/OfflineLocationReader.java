@@ -6,10 +6,7 @@ import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -19,14 +16,14 @@ import java.util.logging.Logger;
 
 public class OfflineLocationReader implements Listener {
 
-  private final ConfigKeeper<MainSection> config;
+  private final WorldGroupRegistry worldGroupRegistry;
   private final Logger logger;
   private final File mainWorldPlayerDataFolder;
 
-  private final Map<UUID, String> worldNameByUuidCache;
-  private final Set<String> knownWorldNamesLower;
+  private final Map<UUID, WorldGroup> worldGroupByUuidCache;
 
   public OfflineLocationReader(
+    WorldGroupRegistry worldGroupRegistry,
     ConfigKeeper<MainSection> config,
     Logger logger
   ) {
@@ -42,56 +39,40 @@ public class OfflineLocationReader implements Listener {
       throw new IllegalStateException("Could not get a reference to the main-world's world-folder");
 
     this.mainWorldPlayerDataFolder = new File(mainWorldFolder, "playerdata");
-    this.config = config;
+    this.worldGroupRegistry = worldGroupRegistry;
     this.logger = logger;
-    this.worldNameByUuidCache = new HashMap<>();
-    this.knownWorldNamesLower = new HashSet<>();
+    this.worldGroupByUuidCache = new HashMap<>();
 
-    for (var world : Bukkit.getServer().getWorlds())
-      knownWorldNamesLower.add(world.getName().toLowerCase());
-
-    // Could have re-configured the offline-player world-name fallback, which could be cached
-    config.registerReloadListener(worldNameByUuidCache::clear);
+    config.registerReloadListener(worldGroupByUuidCache::clear);
   }
 
-  public @Nullable String getLocationWorldName(OfflinePlayer player) {
+  public @Nullable WorldGroup getLastLocationWorldGroup(OfflinePlayer player) {
     var playerId = player.getUniqueId();
 
     if (player instanceof Player onlinePlayer) {
-      worldNameByUuidCache.remove(playerId);
-      return onlinePlayer.getWorld().getName();
+      worldGroupByUuidCache.remove(playerId);
+      return worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(onlinePlayer.getWorld().getName());
     }
 
-    var worldNameLower = worldNameByUuidCache.computeIfAbsent(playerId, this::getWorldNameLowerFromPlayerDataFile);
+    WorldGroup result;
 
-    if (worldNameLower == null)
+    if ((result = worldGroupByUuidCache.get(playerId)) != null)
+      return result;
+
+    var worldName = getWorldNameLowerFromPlayerDataFile(playerId);
+
+    if (worldName == null)
       return null;
 
-    if (!knownWorldNamesLower.contains(worldNameLower)) {
-      String unknownWarningMessage = "World \"" + worldNameLower + "\" of player \"" + playerId + "\" was unknown";
+    result = worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName);
 
-      String fallback;
-
-      if ((fallback = config.rootSection.fallbackOfflinePlayerWorldLower) != null) {
-        logger.warning(unknownWarningMessage + "; used fallback \"" + fallback + "\"");
-        return fallback;
-      }
-
-      logger.severe(unknownWarningMessage);
+    if (result == null) {
+      logger.severe("World \"" + worldName + "\" of player \"" + playerId + "\" could not be corresponded to an existing world-group");
       return null;
     }
 
-    return worldNameLower;
-  }
-
-  @EventHandler
-  public void onWorldLoad(WorldLoadEvent event) {
-    knownWorldNamesLower.add(event.getWorld().getName().toLowerCase());
-  }
-
-  @EventHandler
-  public void onWorldUnload(WorldUnloadEvent event) {
-    knownWorldNamesLower.remove(event.getWorld().getName().toLowerCase());
+    worldGroupByUuidCache.put(playerId, result);
+    return result;
   }
 
   private @Nullable String getWorldNameLowerFromPlayerDataFile(UUID uuid) {
