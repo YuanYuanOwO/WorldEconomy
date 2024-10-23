@@ -21,7 +21,7 @@ import java.util.logging.Level;
 public class WorldEconomyPlugin extends JavaPlugin {
 
   private @Nullable WorldEconomyProvider provider;
-  private @Nullable EconomyDataRegistry accountRegistry;
+  private @Nullable EconomyDataRegistry economyDataRegistry;
 
   @Override
   public void onEnable() {
@@ -42,22 +42,24 @@ public class WorldEconomyPlugin extends JavaPlugin {
       var offlineLocationReader = new OfflineLocationReader(worldGroupRegistry, config, logger);
       Bukkit.getServer().getPluginManager().registerEvents(offlineLocationReader, this);
 
-      accountRegistry = new EconomyDataRegistry(this, offlineLocationReader, worldGroupRegistry, config, logger);
-      Bukkit.getServer().getPluginManager().registerEvents(accountRegistry, this);
+      economyDataRegistry = new EconomyDataRegistry(this, offlineLocationReader, worldGroupRegistry, config, logger);
+      Bukkit.getServer().getPluginManager().registerEvents(economyDataRegistry, this);
 
-      registerProvider(new WorldEconomyProvider(this, config, accountRegistry, offlinePlayerCache));
+      registerProvider(new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache));
 
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(
-          accountRegistry, provider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache
+          economyDataRegistry, provider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache
         )),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(
-          accountRegistry, provider, worldGroupRegistry, offlinePlayerCache
+          economyDataRegistry, provider, worldGroupRegistry, offlinePlayerCache
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
           offlineLocationReader, worldGroupRegistry
         )),
-        new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),
+        new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
+          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, provider
+        )),
         new Tuple<>(config.rootSection.commands.pay, new PayCommand()),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
@@ -75,9 +77,9 @@ public class WorldEconomyPlugin extends JavaPlugin {
       getLogger().log(Level.SEVERE, "Could not unregister economy-provider", e);
     }
 
-    if (accountRegistry != null) {
-      accountRegistry.writeAndClearCache();
-      accountRegistry = null;
+    if (economyDataRegistry != null) {
+      economyDataRegistry.writeAndClearCache();
+      economyDataRegistry = null;
     }
   }
 

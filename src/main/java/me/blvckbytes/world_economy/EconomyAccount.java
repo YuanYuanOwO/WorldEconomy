@@ -44,4 +44,14 @@ public class EconomyAccount {
       return true;
     }
   }
+
+  public boolean set(double value) {
+    synchronized (this) {
+      if (!balanceConstraint.isWithinRange(this, value))
+        return false;
+
+      balance = value;
+      return true;
+    }
+  }
 }
