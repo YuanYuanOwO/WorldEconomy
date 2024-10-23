@@ -33,7 +33,9 @@ public class WorldEconomyPlugin extends JavaPlugin {
       if (!Bukkit.getPluginManager().isPluginEnabled("Vault"))
         throw new IllegalStateException("Expected Vault to be present and enabled");
 
-      var offlineLocationReader = new OfflineLocationReader();
+      var offlineLocationReader = new OfflineLocationReader(config, logger);
+      Bukkit.getServer().getPluginManager().registerEvents(offlineLocationReader, this);
+
       var accountRegistry = new EconomyAccountRegistry(offlineLocationReader, config, logger);
 
       registerProvider(new WorldEconomyProvider(this, config, accountRegistry));
@@ -44,7 +46,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand()),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand()),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),
-        new Tuple<>(config.rootSection.commands.pay, new PayCommand(worldGroupRegistry)),
+        new Tuple<>(config.rootSection.commands.pay, new PayCommand(worldGroupRegistry, offlineLocationReader)),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {

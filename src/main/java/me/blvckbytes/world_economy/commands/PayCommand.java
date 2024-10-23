@@ -1,7 +1,9 @@
 package me.blvckbytes.world_economy.commands;
 
 import me.blvckbytes.gpeee.GPEEE;
+import me.blvckbytes.world_economy.OfflineLocationReader;
 import me.blvckbytes.world_economy.WorldGroupRegistry;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,9 +16,11 @@ public class PayCommand implements CommandExecutor {
    */
 
   private final WorldGroupRegistry worldGroupRegistry;
+  private final OfflineLocationReader offlineLocationReader;
 
-  public PayCommand(WorldGroupRegistry worldGroupRegistry) {
+  public PayCommand(WorldGroupRegistry worldGroupRegistry, OfflineLocationReader offlineLocationReader) {
     this.worldGroupRegistry = worldGroupRegistry;
+    this.offlineLocationReader = offlineLocationReader;
   }
 
   @Override
@@ -33,6 +37,12 @@ public class PayCommand implements CommandExecutor {
       if (args[0].equalsIgnoreCase("identifier")) {
         var result = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(args[1]);
         sender.sendMessage("Result: " + (result == null ? "null" : result.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT)));
+        return true;
+      }
+
+      if (args[0].equalsIgnoreCase("world")) {
+        var result = offlineLocationReader.getLocationWorldName(Bukkit.getOfflinePlayer(args[1]));
+        sender.sendMessage("Result: " + (result == null ? "null" : result));
         return true;
       }
     }
