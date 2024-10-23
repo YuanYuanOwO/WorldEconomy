@@ -8,6 +8,8 @@ public enum PluginPermission {
   COMMAND_BALANCES_OTHER("command.balances.other"),
   COMMAND_BALANCE("command.balance"),
   COMMAND_BALANCE_OTHER("command.balance.other"),
+  COMMAND_BALTOP("command.baltop"),
+  COMMAND_BALTOP_GROUP("command.baltop.group"),
   ;
 
   private static final String PREFIX = "worldeconomy";

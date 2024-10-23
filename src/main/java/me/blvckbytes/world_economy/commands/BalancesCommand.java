@@ -6,9 +6,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class BalancesCommand implements CommandExecutor {
+import java.util.List;
+
+public class BalancesCommand implements CommandExecutor, TabCompleter {
 
   private final EconomyDataRegistry accountRegistry;
   private final WorldEconomyProvider economyProvider;
@@ -75,5 +78,16 @@ public class BalancesCommand implements CommandExecutor {
     }
 
     return true;
+  }
+
+  @Override
+  public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCES_OTHER.has(player))
+      return List.of();
+
+    if (args.length == 1)
+      return offlinePlayerCache.createSuggestions(args[0]);
+
+    return List.of();
   }
 }

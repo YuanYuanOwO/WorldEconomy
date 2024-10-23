@@ -111,6 +111,9 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCE_OTHER.has(player))
+      return List.of();
+
     if (args.length == 1)
       return offlinePlayerCache.createSuggestions(args[0]);
 
