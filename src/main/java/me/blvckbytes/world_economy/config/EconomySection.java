@@ -19,6 +19,7 @@ public class EconomySection extends AConfigSection {
   public @Nullable Double minPayAmount;
   public boolean doClampOnLoad;
   public long cacheWritePeriodSeconds;
+  public long offlinePlayerCacheSeconds;
 
   @CSAlways
   public NumberFormatSection currencyFormat;
@@ -51,5 +52,8 @@ public class EconomySection extends AConfigSection {
 
     if (cacheWritePeriodSeconds < 15)
       throw new MappingError("The cache write period cannot be below 15s, as to not cause needless lag");
+
+    if (offlinePlayerCacheSeconds < 15)
+      throw new MappingError("The offline-player cache duration cannot be below 15s, as to not cause needless lag");
   }
 }

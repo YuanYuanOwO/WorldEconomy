@@ -42,7 +42,11 @@ worldGroups:
       - world_the_end
 
 economy:
+  # Duration in-between writing accounts from memory to their corresponding files
+  # Too little gaps will cause needless lag, too large may result in data-loss on unexpected shutdowns
   cacheWritePeriodSeconds: 30
+  # For how long to keep accounts of offline-players in memory
+  offlinePlayerCacheSeconds: 300
   nameSingular: 'Euro'
   namePlural: 'Euros'
   startingBalance: 200.0

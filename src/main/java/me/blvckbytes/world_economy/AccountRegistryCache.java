@@ -1,5 +1,7 @@
 package me.blvckbytes.world_economy;
 
+import me.blvckbytes.bukkitevaluable.ConfigKeeper;
+import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -13,11 +15,10 @@ import java.util.function.Function;
 
 public class AccountRegistryCache {
 
-  private static final long OFFLINE_PLAYER_CACHE_DURATION_TICKS = 20 * 60 * 5;
-
   private final Plugin plugin;
   private final Function<OfflinePlayer, EconomyAccountRegistry> computer;
   private final Consumer<EconomyAccountRegistry> removalHandler;
+  private final ConfigKeeper<MainSection> config;
 
   private final Map<UUID, EconomyAccountRegistry> accountRegistryByPlayerId;
   private final Map<UUID, BukkitTask> deletionTaskByPlayerId;
@@ -25,11 +26,13 @@ public class AccountRegistryCache {
   public AccountRegistryCache(
     Plugin plugin,
     Function<OfflinePlayer, EconomyAccountRegistry> computer,
-    Consumer<EconomyAccountRegistry> removalHandler
+    Consumer<EconomyAccountRegistry> removalHandler,
+    ConfigKeeper<MainSection> config
   ) {
     this.plugin = plugin;
     this.computer = computer;
     this.removalHandler = removalHandler;
+    this.config = config;
 
     this.accountRegistryByPlayerId = new HashMap<>();
     this.deletionTaskByPlayerId = new HashMap<>();
@@ -112,7 +115,7 @@ public class AccountRegistryCache {
           if (!player.isOnline())
             this.remove(player);
         },
-        OFFLINE_PLAYER_CACHE_DURATION_TICKS
+        config.rootSection.economy.offlinePlayerCacheSeconds * 20
       )
     );
   }

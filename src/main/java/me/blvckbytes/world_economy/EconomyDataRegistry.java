@@ -63,7 +63,7 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     this.config = config;
     this.logger = logger;
 
-    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadPlayerFile, this::storePlayerFile);
+    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadPlayerFile, this::storePlayerFile, config);
 
     // Could have re-configured the min/max/doClamp values, so clamping could be necessary
     // Same holds true for the world-groups, which would have to be re-evaluated when loading
