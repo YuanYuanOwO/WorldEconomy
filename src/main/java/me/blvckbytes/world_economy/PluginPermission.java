@@ -11,6 +11,10 @@ public enum PluginPermission {
   COMMAND_BALTOP("command.baltop"),
   COMMAND_BALTOP_GROUP("command.baltop.group"),
   COMMAND_MONEY("command.money"),
+  COMMAND_PAY("command.pay"),
+  COMMAND_PAY_TARGET("command.pay.target"),
+  COMMAND_PAY_SOURCE("command.pay.source"),
+  COMMAND_PAY_CROSS("command.pay.cross"),
   ;
 
   private static final String PREFIX = "worldeconomy";

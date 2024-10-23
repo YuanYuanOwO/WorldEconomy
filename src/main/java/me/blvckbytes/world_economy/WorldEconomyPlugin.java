@@ -20,7 +20,7 @@ import java.util.logging.Level;
 
 public class WorldEconomyPlugin extends JavaPlugin {
 
-  private @Nullable WorldEconomyProvider provider;
+  private @Nullable WorldEconomyProvider economyProvider;
   private @Nullable EconomyDataRegistry economyDataRegistry;
 
   @Override
@@ -49,18 +49,20 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(
-          economyDataRegistry, provider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache
+          economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache
         )),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(
-          economyDataRegistry, provider, worldGroupRegistry, offlinePlayerCache
+          economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
           offlineLocationReader, worldGroupRegistry
         )),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
-          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, provider
+          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider
         )),
-        new Tuple<>(config.rootSection.commands.pay, new PayCommand()),
+        new Tuple<>(config.rootSection.commands.pay, new PayCommand(
+          offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider
+        )),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {
@@ -112,7 +114,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
   @SuppressWarnings("unchecked")
   private void registerProvider(WorldEconomyProvider provider) throws ClassNotFoundException {
-    this.provider = provider;
+    this.economyProvider = provider;
 
     Bukkit.getServer().getServicesManager().register(
       (Class<Object>) Class.forName("net.milkbowl.vault.economy.Economy"),
@@ -122,10 +124,10 @@ public class WorldEconomyPlugin extends JavaPlugin {
   }
 
   private void unregisterProvider() {
-    if (provider == null)
+    if (economyProvider == null)
       return;
 
-    Bukkit.getServer().getServicesManager().unregister(provider);
-    provider = null;
+    Bukkit.getServer().getServicesManager().unregister(economyProvider);
+    economyProvider = null;
   }
 }
