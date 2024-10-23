@@ -10,6 +10,7 @@ public class MainSection extends AConfigSection {
 
   public PlayerMessagesSection playerMessages;
   public CommandsSection commands;
+  public EconomySection economy;
 
   @CSInlined
   public WorldGroupsSection worldGroups;

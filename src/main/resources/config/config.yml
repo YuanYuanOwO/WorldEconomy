@@ -37,6 +37,30 @@ worldGroups:
       - world_nether
       - world_the_end
 
+economy:
+  nameSingular: 'Euro'
+  namePlural: 'Euros'
+  startingBalance: 200.0
+  # Set to null for no upper bound
+  maxMoney: null
+  # Set to null for no lower bound
+  minMoney: -1000.0
+  # Set to null for no lower bound
+  minPayAmount: .001
+
+  # Set to null to not render
+  currencyFormatPrefix: '€ '
+  # Set to null to not render
+  currencyFormatSuffix: null
+  currencyFormat:
+    # https://en.wikipedia.org/wiki/IETF_language_tag#List_of_common_primary_language_subtags
+    subtagName: 'en'
+    # https://docs.oracle.com/javase/8/docs/api/index.html?java/math/RoundingMode.html
+    roundingMode: FLOOR
+    useGrouping: true
+    minimumFractionDigits: 2
+    maximumFractionDigits: 2
+
 playerMessages:
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
