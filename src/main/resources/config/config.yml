@@ -113,6 +113,50 @@ playerMessages:
   missingPermissionBalanceOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balance of others."'
   playerOnlyBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
 
+  playerOnlyPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can pay to others."'
+  cannotPaySelf$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay yourself."'
+  cannotPayCrossWorldGroups$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay to another world-group than you''re currently in."'
+  # label: String
+  # group_names: String
+  usagePayCommand$: |
+    names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
+    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> [target group: " & names_string & "&c] [source group: " & names_string & "&c]"
+  missingPermissionCommandPayTarget$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom target world-group."'
+  missingPermissionCommandPaySource$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom source world-group."'
+  # value: String
+  argumentIsNotADouble$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a valid floating-point number."'
+  argumentIsNotStrictlyPositive$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not strictly positive."'
+  # balance: String
+  # amount: String
+  # group: String
+  notEnoughMoneyToPay$: 'lut["MESSAGE_PREFIX"] & "&cYour balance of &e" & balance & " &cin &e" & group & " &cdoes not suffice to pay &e" & amount & "&c."'
+  # balance: String
+  # amount: String
+  # group: String
+  # name: String
+  paymentExceedsReceiversBalance$: 'lut["MESSAGE_PREFIX"] & "&cA payment of &e" & amount & " &cwould exceed &e" & name & "''s &cbalance."'
+  # target_old_balance: String
+  # target_new_balance: String
+  # source_old_balance: String
+  # source_new_balance: String
+  # amount: String
+  # target_group: String
+  # source_group: String
+  # sender_name: String
+  # receiver_name: String
+  paymentSentToPlayer$: 'lut["MESSAGE_PREFIX"] & "&7You have sent &e" & amount & " &7to &e" & receiver_name & "&7; new balance of &e" & source_group & "&7: &e" & source_new_balance & "&7."'
+  # target_old_balance: String
+  # target_new_balance: String
+  # source_old_balance: String
+  # source_new_balance: String
+  # amount: String
+  # target_group: String
+  # source_group: String
+  # sender_name: String
+  # receiver_name: String
+  paymentReceivedFromPlayer$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & "&7; new balance of &e" & target_group & "&7: &e" & target_new_balance & "&7."'
+  missingPermissionPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the pay command."'
+
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionReloadCommand$: '@{MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'

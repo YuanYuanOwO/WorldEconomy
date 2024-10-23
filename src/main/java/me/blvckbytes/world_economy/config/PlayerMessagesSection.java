@@ -21,11 +21,25 @@ public class PlayerMessagesSection extends AConfigSection {
   public BukkitEvaluable balanceMessageSelf;
   public BukkitEvaluable balanceMessageOther;
 
+  public BukkitEvaluable playerOnlyPayCommand;
+  public BukkitEvaluable missingPermissionPayCommand;
+  public BukkitEvaluable cannotPaySelf;
+  public BukkitEvaluable cannotPayCrossWorldGroups;
+  public BukkitEvaluable usagePayCommand;
+  public BukkitEvaluable missingPermissionCommandPayTarget;
+  public BukkitEvaluable missingPermissionCommandPaySource;
+
   public BukkitEvaluable unknownWorldGroup;
   public BukkitEvaluable notInAnyWorldGroupSelf;
   public BukkitEvaluable notInAnyWorldGroupOther;
   public BukkitEvaluable couldNotLoadAccountSelf;
   public BukkitEvaluable couldNotLoadAccountOther;
+  public BukkitEvaluable argumentIsNotADouble;
+  public BukkitEvaluable argumentIsNotStrictlyPositive;
+  public BukkitEvaluable notEnoughMoneyToPay;
+  public BukkitEvaluable paymentExceedsReceiversBalance;
+  public BukkitEvaluable paymentSentToPlayer;
+  public BukkitEvaluable paymentReceivedFromPlayer;
 
   public BukkitEvaluable pluginReloadedSuccess;
   public BukkitEvaluable pluginReloadedError;

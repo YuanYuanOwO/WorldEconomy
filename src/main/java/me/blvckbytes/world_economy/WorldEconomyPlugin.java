@@ -61,7 +61,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
           offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider
         )),
         new Tuple<>(config.rootSection.commands.pay, new PayCommand(
-          offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider
+          offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
