@@ -126,7 +126,7 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
     var result = new LinkedHashMap<String, String>();
 
     for (var worldGroup : worldGroupRegistry.getWorldGroups()) {
-      var displayName = worldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT);
+      var displayName = worldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment);
       var accountBalance = accountRegistry.getAccount(worldGroup).getBalance();
       result.put(displayName, economyProvider.format(accountBalance));
     }

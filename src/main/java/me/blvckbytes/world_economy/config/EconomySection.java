@@ -14,8 +14,8 @@ public class EconomySection extends AConfigSection {
   public String nameSingular;
   public String namePlural;
   public double startingBalance;
-  public @Nullable Double maxMoney;
-  public @Nullable Double minMoney;
+  public Double maxMoney;
+  public Double minMoney;
   public @Nullable Double minPayAmount;
   public boolean doClampOnLoad;
   public long cacheWritePeriodSeconds;
@@ -31,6 +31,9 @@ public class EconomySection extends AConfigSection {
 
     this.nameSingular = "undefined";
     this.namePlural = "undefined";
+
+    this.maxMoney = Double.MAX_VALUE;
+    this.minMoney = Double.MIN_VALUE;
   }
 
   @Override

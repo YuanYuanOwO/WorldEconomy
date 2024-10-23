@@ -151,7 +151,7 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
       config.rootSection.getBaseEnvironment()
         .withStaticVariable("holder", targetRegistry.getHolder().getName())
         .withStaticVariable("balance", economyProvider.format(targetRegistry.getAccount(targetWorldGroup).getBalance()))
-        .withStaticVariable("group", targetWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
+        .withStaticVariable("group", targetWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
         .build()
     ));
 

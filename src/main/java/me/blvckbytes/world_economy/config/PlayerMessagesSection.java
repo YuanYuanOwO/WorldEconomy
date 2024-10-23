@@ -41,6 +41,21 @@ public class PlayerMessagesSection extends AConfigSection {
   public BukkitEvaluable paymentSentToPlayer;
   public BukkitEvaluable paymentReceivedFromPlayer;
 
+  public BukkitEvaluable missingPermissionMoneyCommand;
+  public BukkitEvaluable unknownMoneyCommandAction;
+  public BukkitEvaluable usageMoneyCommand;
+  public BukkitEvaluable playerOnlyMoneyCommandNoWorldGroup;
+  public BukkitEvaluable moneyCommandConsoleName;
+  public BukkitEvaluable moneyAddExceedsReceiversBalance;
+  public BukkitEvaluable moneyRemoveExceedsReceiversBalance;
+  public BukkitEvaluable moneySetExceedsReceiversBalance;
+  public BukkitEvaluable moneyCommandAddExecutor;
+  public BukkitEvaluable moneyCommandRemoveExecutor;
+  public BukkitEvaluable moneyCommandSetExecutor;
+  public BukkitEvaluable moneyCommandAddTarget;
+  public BukkitEvaluable moneyCommandRemoveTarget;
+  public BukkitEvaluable moneyCommandSetTarget;
+
   public BukkitEvaluable pluginReloadedSuccess;
   public BukkitEvaluable pluginReloadedError;
 

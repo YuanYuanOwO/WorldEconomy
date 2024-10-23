@@ -186,6 +186,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     }
 
     else {
+      // TODO: Have separate usages based on permissions
       sender.sendMessage(config.rootSection.playerMessages.usagePayCommand.stringify(
         config.rootSection.getBaseEnvironment()
           .withStaticVariable("label", label)
@@ -217,7 +218,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
         config.rootSection.getBaseEnvironment()
           .withStaticVariable("balance", economyProvider.format(sourceAccount.getBalance()))
           .withStaticVariable("amount", economyProvider.format(amount))
-          .withStaticVariable("group", sourceWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
+          .withStaticVariable("group", sourceWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
           .build()
       ));
 
@@ -231,7 +232,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
         config.rootSection.getBaseEnvironment()
           .withStaticVariable("balance", economyProvider.format(targetAccount.getBalance()))
           .withStaticVariable("amount", economyProvider.format(amount))
-          .withStaticVariable("group", targetWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
+          .withStaticVariable("group", targetWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
           .withStaticVariable("name", targetAccountRegistry.getHolder().getName())
           .build()
       ));
@@ -247,8 +248,8 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       .withStaticVariable("source_new_balance", economyProvider.format(sourceAccount.getBalance()))
       .withStaticVariable("target_new_balance", economyProvider.format(targetAccount.getBalance()))
       .withStaticVariable("amount", economyProvider.format(amount))
-      .withStaticVariable("target_group", targetWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
-      .withStaticVariable("source_group", sourceWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
+      .withStaticVariable("target_group", targetWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
+      .withStaticVariable("source_group", sourceWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
       .withStaticVariable("sender_name", player.getName())
       .withStaticVariable("receiver_name", targetAccountRegistry.getHolder().getName())
       .build();

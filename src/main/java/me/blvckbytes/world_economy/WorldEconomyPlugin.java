@@ -58,7 +58,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
           offlineLocationReader, worldGroupRegistry
         )),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
-          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider
+          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.pay, new PayCommand(
           offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config

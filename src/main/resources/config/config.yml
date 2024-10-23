@@ -157,6 +157,34 @@ playerMessages:
   paymentReceivedFromPlayer$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & "&7; new balance of &e" & target_group & "&7: &e" & target_new_balance & "&7."'
   missingPermissionPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the pay command."'
 
+  missingPermissionMoneyCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the money command."'
+  # input: String
+  # actions: List<String>
+  unknownMoneyCommandAction$: 'lut["MESSAGE_PREFIX"] & "&cThe action &4" & input & " &cis not one of &e" & iter_cat(actions, (action) => "&e" & action, "&7,") & "&c."'
+  # label: String
+  # actions: List<String>
+  # group_names: List<String>
+  usageMoneyCommand$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <" & iter_cat(actions, (action) => "&e" & action) & "&c> <player> <value> [" & iter_cat(group_names, (group_name) => "&e" & group_name) & "&c]"'
+  playerOnlyMoneyCommandNoWorldGroup$: 'lut["MESSAGE_PREFIX"] & "&cOnly players can use the money-command without specifying a world-group."'
+  moneyCommandConsoleName$: '"&5Console"'
+  # target_old_balance: String
+  # amount: String
+  # group: String
+  # target_name: String
+  # executor_name: String
+  # balance_max: String
+  # balance_min: String
+  moneyAddExceedsReceiversBalance$: 'lut["MESSAGE_PREFIX"] & "&cAdding &e" & amount & " &cwould exceed &e" & target_name & "''s &cmaximum balance."'
+  moneyRemoveExceedsReceiversBalance$: 'lut["MESSAGE_PREFIX"] & "&cRemoving &e" & amount & " &cwould exceed &e" & target_name & "''s &cminimum balance."'
+  moneySetExceedsReceiversBalance$: 'lut["MESSAGE_PREFIX"] & "&cSetting to &e" & amount & " &cwould exceed &e" & target_name & "''s &cbalance-constraints."'
+  # target_new_balance: String
+  moneyCommandAddExecutor$: 'lut["MESSAGE_PREFIX"] & "&7Added &a" & amount & " &7to &e" & target_name & "''s &7account in &e" & group & "&7; new balance: &e" & target_new_balance'
+  moneyCommandRemoveExecutor$: 'lut["MESSAGE_PREFIX"] & "&7Removed &c" & amount & " &7from &e" & target_name & "''s &7account in &e" & group & "&7; new balance: &e" & target_new_balance'
+  moneyCommandSetExecutor$: 'lut["MESSAGE_PREFIX"] & "&7Set balance of &e" & target_name & " &7to &e" & amount & " &7in &e" & group & "&7."'
+  moneyCommandAddTarget$: 'lut["MESSAGE_PREFIX"] & "&e" & executor_name & " &7has added &a" & amount & " &7to your account in &e" & group & "&7; new balance: &e" & target_new_balance'
+  moneyCommandRemoveTarget$: 'lut["MESSAGE_PREFIX"] & "&e" & executor_name & " &7has removed &c" & amount & " &7from your account in &e" & group & "&7; new balance: &e" & target_new_balance'
+  moneyCommandSetTarget$: 'lut["MESSAGE_PREFIX"] & "&e" & executor_name & " &7has set your balance to &e" & amount & " &7in &e" & group & "&7."'
+
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionReloadCommand$: '@{MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'

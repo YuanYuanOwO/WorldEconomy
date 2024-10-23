@@ -1,6 +1,9 @@
 package me.blvckbytes.world_economy.commands;
 
+import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
+import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.*;
+import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,69 +19,102 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
   private final OfflineLocationReader offlineLocationReader;
   private final WorldGroupRegistry worldGroupRegistry;
   private final WorldEconomyProvider economyProvider;
+  private final ConfigKeeper<MainSection> config;
 
   public MoneyCommand(
     OfflinePlayerCache offlinePlayerCache,
     EconomyDataRegistry economyDataRegistry,
     OfflineLocationReader offlineLocationReader,
     WorldGroupRegistry worldGroupRegistry,
-    WorldEconomyProvider economyProvider
+    WorldEconomyProvider economyProvider,
+    ConfigKeeper<MainSection> config
   ) {
     this.offlinePlayerCache = offlinePlayerCache;
     this.economyDataRegistry = economyDataRegistry;
     this.offlineLocationReader = offlineLocationReader;
     this.worldGroupRegistry = worldGroupRegistry;
     this.economyProvider = economyProvider;
+    this.config = config;
   }
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    if (sender instanceof Player player && !PluginPermission.COMMAND_MONEY.has(player)) {
-      player.sendMessage("§cNo permission to use the money command");
+    if (!PluginPermission.COMMAND_MONEY.has(sender)) {
+      sender.sendMessage(config.rootSection.playerMessages.missingPermissionMoneyCommand.stringify(
+        config.rootSection.builtBaseEnvironment
+      ));
+
       return true;
     }
 
     MoneyAction action;
-    EconomyAccountRegistry accountRegistry;
-    double value;
+    EconomyAccountRegistry targetAccountRegistry;
+    double amount;
     WorldGroup targetWorldGroup;
 
     if (args.length == 3 || args.length == 4) {
       if ((action = MoneyAction.getByName(args[0])) == null) {
-        sender.sendMessage("§cUsage: /" + label + " <set/remove/add> <player> <value> [world-group]");
+        sender.sendMessage(config.rootSection.playerMessages.unknownMoneyCommandAction.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("input", args[0])
+            .withStaticVariable("actions", MoneyAction.names)
+            .build()
+        ));
+
         return true;
       }
 
       var targetPlayer = offlinePlayerCache.getByName(args[1]);
-      accountRegistry = economyDataRegistry.getAccountRegistry(targetPlayer);
+      targetAccountRegistry = economyDataRegistry.getAccountRegistry(targetPlayer);
 
-      if (accountRegistry == null) {
-        sender.sendMessage("§cPlayer " + targetPlayer.getName() + " is not known on this server");
+      if (targetAccountRegistry == null) {
+        sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountOther.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("name", targetPlayer.getName())
+            .build()
+        ));
+
         return true;
       }
 
       try {
-        value = Double.parseDouble(args[2]);
+        amount = Double.parseDouble(args[2]);
       } catch (NumberFormatException e) {
-        sender.sendMessage("§cValue is not a valid number: §4" + args[2]);
+        sender.sendMessage(config.rootSection.playerMessages.argumentIsNotADouble.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("value", args[2])
+            .build()
+        ));
+
         return true;
       }
 
-      if (value < 0) {
-        sender.sendMessage("§cValue cannot be less than zero: §4" + value);
+      if (amount <= 0) {
+        sender.sendMessage(config.rootSection.playerMessages.argumentIsNotStrictlyPositive.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("value", args[2])
+            .build()
+        ));
+
         return true;
       }
 
       if (args.length == 3) {
         if (!(sender instanceof Player player)) {
-          sender.sendMessage("§cOnly available to players");
+          sender.sendMessage(config.rootSection.playerMessages.playerOnlyMoneyCommandNoWorldGroup.stringify(
+            config.rootSection.builtBaseEnvironment
+          ));
+
           return false;
         }
 
         targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
 
         if (targetWorldGroup == null) {
-          sender.sendMessage("§cYou're currently not in any known world-group");
+          sender.sendMessage(config.rootSection.playerMessages.notInAnyWorldGroupSelf.stringify(
+            config.rootSection.builtBaseEnvironment
+          ));
+
           return true;
         }
       }
@@ -87,95 +123,124 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
         targetWorldGroup = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(args[3]);
 
         if (targetWorldGroup == null) {
-          sender.sendMessage("§cWorld-group with name " + args[3] + " not found");
+          sender.sendMessage(config.rootSection.playerMessages.unknownWorldGroup.stringify(
+            config.rootSection.getBaseEnvironment()
+              .withStaticVariable("name", args[3])
+              .build()
+          ));
+
           return true;
         }
       }
     }
 
     else {
-      sender.sendMessage("§cUsage: /" + label + " <set/remove/add> <player> <value> [world-group]");
+      sender.sendMessage(config.rootSection.playerMessages.usageMoneyCommand.stringify(
+        config.rootSection.getBaseEnvironment()
+          .withStaticVariable("label", label)
+          .withStaticVariable("actions", MoneyAction.names)
+          .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
+          .build()
+      ));
+
       return true;
     }
 
-    var targetAccount = accountRegistry.getAccount(targetWorldGroup);
+    var targetAccount = targetAccountRegistry.getAccount(targetWorldGroup);
 
-    // TODO: Yes, this is hella repetitive; will clear it up once messages are added to config.
+    String executorName;
+
+    if (sender instanceof Player player)
+      executorName = player.getName();
+    else {
+      executorName = config.rootSection.playerMessages.moneyCommandConsoleName.stringify(
+        config.rootSection.builtBaseEnvironment
+      );
+    }
+
+    var actionEnvironmentBase = config.rootSection.getBaseEnvironment()
+      .withStaticVariable("target_old_balance", economyProvider.format(targetAccount.getBalance()))
+      .withStaticVariable("amount", economyProvider.format(amount))
+      .withStaticVariable("group", targetWorldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment))
+      .withStaticVariable("target_name", targetAccountRegistry.getHolder().getName())
+      .withStaticVariable("executor_name", executorName)
+      .withStaticVariable("executor_name", executorName)
+      .withStaticVariable("balance_max", economyProvider.format(config.rootSection.economy.maxMoney))
+      .withStaticVariable("balance_min", economyProvider.format(config.rootSection.economy.minMoney));
+
+    Player targetPlayer;
 
     switch (action) {
       case Add -> {
-        if (!targetAccount.deposit(value)) {
-          sender.sendMessage("§cMaximum money exceeded");
+        if (!targetAccount.deposit(amount)) {
+          sender.sendMessage(config.rootSection.playerMessages.moneyAddExceedsReceiversBalance.stringify(
+            actionEnvironmentBase.build()
+          ));
+
           return true;
         }
-
-        var formattedValue = economyProvider.format(value);
-
-        sender.sendMessage("§aGave " + accountRegistry.getHolder().getName() + " " + formattedValue);
-
-        Player targetPlayer;
-
-        if ((targetPlayer = accountRegistry.getHolder().getPlayer()) != null) {
-          if (sender instanceof Player executor)
-            targetPlayer.sendMessage("§aYou have been given " + formattedValue + " §aby " + executor.getName());
-          else
-            targetPlayer.sendMessage("§aYou have been given " + formattedValue + " §aby Console");
-        }
-
-        return true;
       }
 
       case Remove -> {
-        if (!targetAccount.withdraw(value)) {
-          sender.sendMessage("§cMinimum money exceeded");
+        if (!targetAccount.withdraw(amount)) {
+          sender.sendMessage(config.rootSection.playerMessages.moneyRemoveExceedsReceiversBalance.stringify(
+            actionEnvironmentBase.build()
+          ));
+
           return true;
         }
-
-        var formattedValue = economyProvider.format(value);
-
-        sender.sendMessage("§aRemoved " + formattedValue + " from " + accountRegistry.getHolder().getName());
-
-        Player targetPlayer;
-
-        if ((targetPlayer = accountRegistry.getHolder().getPlayer()) != null) {
-          if (sender instanceof Player executor)
-            targetPlayer.sendMessage("§a" + executor.getName() + " has removed " + formattedValue + " §afrom your account");
-          else
-            targetPlayer.sendMessage("§aConsole has removed " + formattedValue + " §afrom your account");
-        }
-
-        return true;
       }
 
       case Set -> {
-        if (!targetAccount.set(value)) {
-          sender.sendMessage("§cValue not within range of min and max");
+        if (!targetAccount.set(amount)) {
+          sender.sendMessage(config.rootSection.playerMessages.moneySetExceedsReceiversBalance.stringify(
+            actionEnvironmentBase.build()
+          ));
+
           return true;
         }
+      }
+    }
 
-        var formattedValue = economyProvider.format(value);
+    var actionEnvironment = actionEnvironmentBase
+      .withStaticVariable("target_new_balance", economyProvider.format(targetAccount.getBalance()))
+      .build();
 
-        sender.sendMessage("§aSet balance of " + accountRegistry.getHolder().getName() + " to " + formattedValue);
+    BukkitEvaluable executorMessage;
+    BukkitEvaluable targetMessage;
 
-        Player targetPlayer;
+    switch (action) {
+      case Add -> {
+        executorMessage = config.rootSection.playerMessages.moneyCommandAddExecutor;
+        targetMessage = config.rootSection.playerMessages.moneyCommandAddTarget;
+      }
 
-        if ((targetPlayer = accountRegistry.getHolder().getPlayer()) != null) {
-          if (sender instanceof Player executor)
-            targetPlayer.sendMessage("§a" + executor.getName() + " has set your balanace to " + formattedValue);
-          else
-            targetPlayer.sendMessage("§aConsole has set your balanace to " + formattedValue);
-        }
+      case Remove -> {
+        executorMessage = config.rootSection.playerMessages.moneyCommandRemoveExecutor;
+        targetMessage = config.rootSection.playerMessages.moneyCommandRemoveTarget;
+      }
 
+      case Set -> {
+        executorMessage = config.rootSection.playerMessages.moneyCommandSetExecutor;
+        targetMessage = config.rootSection.playerMessages.moneyCommandSetTarget;
+      }
+
+      default -> {
         return true;
       }
     }
+
+    sender.sendMessage(executorMessage.stringify(actionEnvironment));
+
+    if ((targetPlayer = targetAccountRegistry.getHolder().getPlayer()) != null)
+      targetPlayer.sendMessage(targetMessage.stringify(actionEnvironment));
 
     return true;
   }
 
   @Override
   public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-    if (sender instanceof Player player && !PluginPermission.COMMAND_MONEY.has(player))
+    if (!PluginPermission.COMMAND_MONEY.has(sender))
       return List.of();
 
     if (args.length == 1)
@@ -184,8 +249,8 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
     if (args.length == 2)
       return offlinePlayerCache.createSuggestions(args[1]);
 
-    if (args.length == 3)
-      return worldGroupRegistry.createSuggestions(args[2]);
+    if (args.length == 4)
+      return worldGroupRegistry.createSuggestions(args[3]);
 
     return List.of();
   }
