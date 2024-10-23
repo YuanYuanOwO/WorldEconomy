@@ -2,6 +2,7 @@ package me.blvckbytes.world_economy;
 
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -14,6 +15,7 @@ public class WorldGroupRegistry {
   private final ConfigKeeper<MainSection> config;
   private final Map<String, WorldGroup> worldGroupByIdentifierNameLower;
   private final Map<String, WorldGroup> worldGroupByMemberNameLower;
+  private final List<String> worldGroupIdentifiers;
 
   public WorldGroupRegistry(
     ConfigKeeper<MainSection> config,
@@ -23,6 +25,7 @@ public class WorldGroupRegistry {
     this.logger = logger;
     this.worldGroupByIdentifierNameLower = new HashMap<>();
     this.worldGroupByMemberNameLower = new HashMap<>();
+    this.worldGroupIdentifiers = new ArrayList<>();
 
     this.config.registerReloadListener(this::loadFromConfig);
     this.loadFromConfig();
@@ -30,6 +33,14 @@ public class WorldGroupRegistry {
 
   public Collection<WorldGroup> getWorldGroups() {
     return Collections.unmodifiableCollection(worldGroupByIdentifierNameLower.values());
+  }
+
+  public List<String> getWorldGroupIdentifiers() {
+    return Collections.unmodifiableList(worldGroupIdentifiers);
+  }
+
+  public List<String> createSuggestions(String input) {
+    return worldGroupIdentifiers.stream().filter(it -> StringUtils.containsIgnoreCase(it, input)).toList();
   }
 
   public @Nullable WorldGroup getWorldGroupByMemberNameIgnoreCase(String memberName) {
@@ -43,9 +54,11 @@ public class WorldGroupRegistry {
   private void loadFromConfig() {
     this.worldGroupByIdentifierNameLower.clear();
     this.worldGroupByMemberNameLower.clear();
+    this.worldGroupIdentifiers.clear();
 
     for (var worldGroupEntry : this.config.rootSection.worldGroups.worldGroups.entrySet()) {
-      var identifierNameLower = worldGroupEntry.getKey().toLowerCase();
+      var identifierName = worldGroupEntry.getKey();
+      var identifierNameLower = identifierName.toLowerCase();
       var groupDataSection = worldGroupEntry.getValue();
 
       var worldGroup = new WorldGroup(
@@ -58,6 +71,7 @@ public class WorldGroupRegistry {
       );
 
       worldGroupByIdentifierNameLower.put(identifierNameLower, worldGroup);
+      worldGroupIdentifiers.add(identifierName);
 
       for (var memberNameLower : worldGroup.memberWorldNamesLower())
         worldGroupByMemberNameLower.put(memberNameLower, worldGroup);

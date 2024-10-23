@@ -7,25 +7,31 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class BalanceCommand implements CommandExecutor {
+import java.util.List;
+
+public class BalanceCommand implements CommandExecutor, TabCompleter {
 
   private final EconomyDataRegistry accountRegistry;
   private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflineLocationReader offlineLocationReader;
+  private final OfflinePlayerCache offlinePlayerCache;
 
   public BalanceCommand(
     EconomyDataRegistry accountRegistry,
     WorldEconomyProvider economyProvider,
     WorldGroupRegistry worldGroupRegistry,
-    OfflineLocationReader offlineLocationReader
+    OfflineLocationReader offlineLocationReader,
+    OfflinePlayerCache offlinePlayerCache
   ) {
     this.accountRegistry = accountRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlineLocationReader = offlineLocationReader;
+    this.offlinePlayerCache = offlinePlayerCache;
   }
 
   // /bal [player] [world-group-identifier]
@@ -105,5 +111,16 @@ public class BalanceCommand implements CommandExecutor {
     );
 
     return true;
+  }
+
+  @Override
+  public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    if (args.length == 1)
+      return offlinePlayerCache.createSuggestions(args[0]);
+
+    if (args.length == 2)
+      return worldGroupRegistry.createSuggestions(args[1]);
+
+    return List.of();
   }
 }
