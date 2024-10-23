@@ -1,26 +1,52 @@
 package me.blvckbytes.world_economy;
 
+import org.bukkit.OfflinePlayer;
+
 public class EconomyAccount {
 
-  // TODO: Consider negative min-balance
+  public final OfflinePlayer holder;
+  private double balance;
+  private final BalanceConstraint balanceConstraint;
+
+  public EconomyAccount(
+    OfflinePlayer holder,
+    double balance,
+    BalanceConstraint balanceConstraint
+  ) {
+    this.holder = holder;
+    this.balance = balance;
+    this.balanceConstraint = balanceConstraint;
+  }
 
   public double getBalance() {
-    // TODO: Implement
-    return 0;
+    synchronized (this) {
+      return balance;
+    }
   }
 
   public boolean hasBalance(double value) {
-    // TODO: Implement
-    return true;
+    synchronized (this) {
+      return balanceConstraint.isWithinRange(this, balance - value);
+    }
   }
 
   public boolean withdraw(double value) {
-    // TODO: Implement
-    return true;
+    synchronized (this) {
+      if (!balanceConstraint.isWithinRange(this, balance - value))
+        return false;
+
+      balance -= value;
+      return true;
+    }
   }
 
   public boolean deposit(double value) {
-    // TODO: Implement
-    return true;
+    synchronized (this) {
+      if (!balanceConstraint.isWithinRange(this, balance + value))
+        return false;
+
+      balance += value;
+      return true;
+    }
   }
 }

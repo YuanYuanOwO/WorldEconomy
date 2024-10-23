@@ -14,9 +14,9 @@ public class EconomySection extends AConfigSection {
   public String nameSingular;
   public String namePlural;
   public double startingBalance;
-  public @Nullable Integer maxMoney;
-  public @Nullable Integer minMoney;
-  public @Nullable Integer minPayAmount;
+  public @Nullable Double maxMoney;
+  public @Nullable Double minMoney;
+  public @Nullable Double minPayAmount;
 
   @CSAlways
   public NumberFormatSection currencyFormat;

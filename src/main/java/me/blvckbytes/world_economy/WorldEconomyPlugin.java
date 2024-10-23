@@ -34,7 +34,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
         throw new IllegalStateException("Expected Vault to be present and enabled");
 
       var offlineLocationReader = new OfflineLocationReader();
-      var accountRegistry = new EconomyAccountRegistry(offlineLocationReader, logger);
+      var accountRegistry = new EconomyAccountRegistry(offlineLocationReader, config, logger);
 
       registerProvider(new WorldEconomyProvider(this, config, accountRegistry));
 
