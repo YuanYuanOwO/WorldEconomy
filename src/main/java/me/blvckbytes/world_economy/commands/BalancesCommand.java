@@ -1,11 +1,7 @@
 package me.blvckbytes.world_economy.commands;
 
 import me.blvckbytes.gpeee.GPEEE;
-import me.blvckbytes.world_economy.EconomyDataRegistry;
-import me.blvckbytes.world_economy.PluginPermission;
-import me.blvckbytes.world_economy.WorldEconomyProvider;
-import me.blvckbytes.world_economy.WorldGroupRegistry;
-import org.bukkit.Bukkit;
+import me.blvckbytes.world_economy.*;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,19 +13,21 @@ public class BalancesCommand implements CommandExecutor {
   private final EconomyDataRegistry accountRegistry;
   private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
+  private final OfflinePlayerCache offlinePlayerCache;
 
   public BalancesCommand(
     EconomyDataRegistry accountRegistry,
     WorldEconomyProvider economyProvider,
-    WorldGroupRegistry worldGroupRegistry
+    WorldGroupRegistry worldGroupRegistry,
+    OfflinePlayerCache offlinePlayerCache
   ) {
     this.accountRegistry = accountRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
+    this.offlinePlayerCache = offlinePlayerCache;
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCES.has(player)) {
       player.sendMessage("§cNo permission for command");
@@ -48,7 +46,7 @@ public class BalancesCommand implements CommandExecutor {
     }
 
     else if (args.length == 1) {
-      target = Bukkit.getOfflinePlayer(args[0]);
+      target = offlinePlayerCache.getByName(args[0]);
 
       if (target != sender && sender instanceof Player player && !PluginPermission.COMMAND_BALANCES_OTHER.has(player)) {
         player.sendMessage("§cNo permission for other");

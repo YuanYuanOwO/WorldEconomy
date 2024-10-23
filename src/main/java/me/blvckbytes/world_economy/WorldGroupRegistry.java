@@ -35,10 +35,6 @@ public class WorldGroupRegistry {
     return Collections.unmodifiableCollection(worldGroupByIdentifierNameLower.values());
   }
 
-  public List<String> getWorldGroupIdentifiers() {
-    return Collections.unmodifiableList(worldGroupIdentifiers);
-  }
-
   public List<String> createSuggestions(String input) {
     return worldGroupIdentifiers.stream().filter(it -> StringUtils.containsIgnoreCase(it, input)).toList();
   }

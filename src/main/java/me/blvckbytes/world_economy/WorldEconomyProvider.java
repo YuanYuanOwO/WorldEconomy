@@ -4,7 +4,6 @@ import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -24,15 +23,18 @@ public class WorldEconomyProvider implements Economy {
   private final Plugin plugin;
   private final ConfigKeeper<MainSection> config;
   private final EconomyDataRegistry accountRegistry;
+  private final OfflinePlayerCache offlinePlayerCache;
 
   public WorldEconomyProvider(
     Plugin plugin,
     ConfigKeeper<MainSection> config,
-    EconomyDataRegistry accountRegistry
+    EconomyDataRegistry accountRegistry,
+    OfflinePlayerCache offlinePlayerCache
   ) {
     this.plugin = plugin;
     this.config = config;
     this.accountRegistry = accountRegistry;
+    this.offlinePlayerCache = offlinePlayerCache;
   }
 
   // ================================================================================
@@ -92,9 +94,8 @@ public class WorldEconomyProvider implements Economy {
   // ================================================================================
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean hasAccount(String name) {
-    return hasAccount(Bukkit.getOfflinePlayer(name));
+    return hasAccount(offlinePlayerCache.getByName(name));
   }
 
   @Override
@@ -103,9 +104,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean hasAccount(String playerName, String worldName) {
-    return hasAccount(Bukkit.getOfflinePlayer(playerName), worldName);
+    return hasAccount(offlinePlayerCache.getByName(playerName), worldName);
   }
 
   @Override
@@ -114,9 +114,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean createPlayerAccount(String playerName) {
-    return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
+    return createPlayerAccount(offlinePlayerCache.getByName(playerName));
   }
 
   @Override
@@ -125,9 +124,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean createPlayerAccount(String playerName, String worldName) {
-    return createPlayerAccount(Bukkit.getOfflinePlayer(playerName), worldName);
+    return createPlayerAccount(offlinePlayerCache.getByName(playerName), worldName);
   }
 
   @Override
@@ -140,9 +138,8 @@ public class WorldEconomyProvider implements Economy {
   // ================================================================================
 
   @Override
-  @SuppressWarnings("deprecation")
   public double getBalance(String playerName) {
-    return getBalance(Bukkit.getOfflinePlayer(playerName));
+    return getBalance(offlinePlayerCache.getByName(playerName));
   }
 
   @Override
@@ -152,9 +149,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public double getBalance(String playerName, String worldName) {
-    return getBalance(Bukkit.getOfflinePlayer(playerName), worldName);
+    return getBalance(offlinePlayerCache.getByName(playerName), worldName);
   }
 
   @Override
@@ -164,9 +160,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean has(String playerName, double value) {
-    return has(Bukkit.getOfflinePlayer(playerName), value);
+    return has(offlinePlayerCache.getByName(playerName), value);
   }
 
   @Override
@@ -176,9 +171,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean has(String playerName, String worldName, double value) {
-    return has(Bukkit.getOfflinePlayer(playerName), worldName, value);
+    return has(offlinePlayerCache.getByName(playerName), worldName, value);
   }
 
   @Override
@@ -192,9 +186,8 @@ public class WorldEconomyProvider implements Economy {
   // ================================================================================
 
   @Override
-  @SuppressWarnings("deprecation")
   public EconomyResponse withdrawPlayer(String playerName, double value) {
-    return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), value);
+    return withdrawPlayer(offlinePlayerCache.getByName(playerName), value);
   }
 
   @Override
@@ -203,9 +196,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public EconomyResponse withdrawPlayer(String playerName, String worldName, double value) {
-    return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), worldName, value);
+    return withdrawPlayer(offlinePlayerCache.getByName(playerName), worldName, value);
   }
 
   @Override
@@ -228,9 +220,8 @@ public class WorldEconomyProvider implements Economy {
   // ================================================================================
 
   @Override
-  @SuppressWarnings("deprecation")
   public EconomyResponse depositPlayer(String playerName, double value) {
-    return depositPlayer(Bukkit.getOfflinePlayer(playerName), value);
+    return depositPlayer(offlinePlayerCache.getByName(playerName), value);
   }
 
   @Override
@@ -239,9 +230,8 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public EconomyResponse depositPlayer(String playerName, String worldName, double value) {
-    return depositPlayer(Bukkit.getOfflinePlayer(playerName), worldName, value);
+    return depositPlayer(offlinePlayerCache.getByName(playerName), worldName, value);
   }
 
   @Override

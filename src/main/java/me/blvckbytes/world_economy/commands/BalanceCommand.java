@@ -2,7 +2,6 @@ package me.blvckbytes.world_economy.commands;
 
 import me.blvckbytes.gpeee.GPEEE;
 import me.blvckbytes.world_economy.*;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,10 +33,7 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
     this.offlinePlayerCache = offlinePlayerCache;
   }
 
-  // /bal [player] [world-group-identifier]
-
   @Override
-  @SuppressWarnings("deprecation")
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCE.has(player)) {
       player.sendMessage("§cNo permission for command");
@@ -56,7 +52,7 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
     }
 
     else if (args.length == 1 || args.length == 2) {
-      target = Bukkit.getOfflinePlayer(args[0]);
+      target = offlinePlayerCache.getByName(args[0]);
 
       if (target != sender && sender instanceof Player player && !PluginPermission.COMMAND_BALANCE_OTHER.has(player)) {
         player.sendMessage("§cNo permission for other");
