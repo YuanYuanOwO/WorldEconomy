@@ -1,5 +1,6 @@
 package me.blvckbytes.world_economy;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public enum PluginPermission {
@@ -26,5 +27,12 @@ public enum PluginPermission {
 
   public boolean has(Player player) {
     return player.hasPermission(node);
+  }
+
+  public boolean has(CommandSender sender) {
+    if (sender instanceof Player player)
+      return has(player);
+
+    return true;
   }
 }

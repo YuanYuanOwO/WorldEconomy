@@ -52,7 +52,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
           economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache
         )),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(
-          economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache
+          economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache, config
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
           offlineLocationReader, worldGroupRegistry

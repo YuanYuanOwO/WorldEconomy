@@ -69,6 +69,29 @@ economy:
     maximumFractionDigits: 2
 
 playerMessages:
+  missingPermissionBalancesSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to use the balances command."'
+  missingPermissionBalancesOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balances of others."'
+  playerOnlyBalancesSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
+  # label: String
+  usageBalancesCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
+  # label: String
+  usageBalancesCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [player]"'
+  couldNotLoadAccountSelf$: 'lut["MESSAGE_PREFIX"] & "&cCould not load your account."'
+  # name: String
+  couldNotLoadAccountOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &chas not played on this server before."'
+  # - holder: String
+  # - balances: Map<String, String>
+  # The key of balances represents the display-name of the world-group, the value its corresponding formatted balance
+  balancesScreen$: |
+    flatten(
+      "&8&m                                                  ",
+      "&7Balances of &e" & holder & "&7:",
+      map(balances, (balance) => (
+        "&8- &e" & key(balance) & "&7: &e" & value(balance)
+      ), "&cNo world-groups found"),
+      "&8&m                                                  "
+    )
+
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionReloadCommand$: '@{MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'

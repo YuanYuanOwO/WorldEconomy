@@ -23,7 +23,7 @@ public class WorldGroupRegistry {
   ) {
     this.config = config;
     this.logger = logger;
-    this.worldGroupByIdentifierNameLower = new HashMap<>();
+    this.worldGroupByIdentifierNameLower = new LinkedHashMap<>();
     this.worldGroupByMemberNameLower = new HashMap<>();
     this.worldGroupIdentifiers = new ArrayList<>();
 
