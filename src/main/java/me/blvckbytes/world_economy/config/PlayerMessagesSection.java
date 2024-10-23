@@ -13,6 +13,17 @@ public class PlayerMessagesSection extends AConfigSection {
   public BukkitEvaluable usageBalancesCommandOther;
   public BukkitEvaluable balancesScreen;
 
+  public BukkitEvaluable playerOnlyBalanceSelfCommand;
+  public BukkitEvaluable missingPermissionBalanceSelfCommand;
+  public BukkitEvaluable missingPermissionBalanceOtherCommand;
+  public BukkitEvaluable usageBalanceCommandSelf;
+  public BukkitEvaluable usageBalanceCommandOther;
+  public BukkitEvaluable balanceMessageSelf;
+  public BukkitEvaluable balanceMessageOther;
+
+  public BukkitEvaluable unknownWorldGroup;
+  public BukkitEvaluable notInAnyWorldGroupSelf;
+  public BukkitEvaluable notInAnyWorldGroupOther;
   public BukkitEvaluable couldNotLoadAccountSelf;
   public BukkitEvaluable couldNotLoadAccountOther;
 

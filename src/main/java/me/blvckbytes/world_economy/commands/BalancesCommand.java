@@ -38,8 +38,6 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    var canViewOthers = PluginPermission.COMMAND_BALANCES_OTHER.has(sender);
-
     if (!PluginPermission.COMMAND_BALANCES.has(sender)) {
       sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalancesSelfCommand.stringify(
         config.rootSection.builtBaseEnvironment
@@ -47,6 +45,8 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
 
       return true;
     }
+
+    var canViewOthers = PluginPermission.COMMAND_BALANCES_OTHER.has(sender);
 
     EconomyAccountRegistry targetRegistry;
 
@@ -71,9 +71,9 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
     }
 
     else if (args.length == 1) {
-      var target = offlinePlayerCache.getByName(args[0]);
+      var targetPlayer = offlinePlayerCache.getByName(args[0]);
 
-      if (target != sender && !canViewOthers) {
+      if (targetPlayer != sender && !canViewOthers) {
         sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalancesOtherCommand.stringify(
           config.rootSection.builtBaseEnvironment
         ));
@@ -81,12 +81,12 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
         return true;
       }
 
-      targetRegistry = dataRegistry.getAccountRegistry(target);
+      targetRegistry = dataRegistry.getAccountRegistry(targetPlayer);
 
       if (targetRegistry == null) {
         sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountOther.stringify(
           config.rootSection.getBaseEnvironment()
-            .withStaticVariable("name", target.getName())
+            .withStaticVariable("name", targetPlayer.getName())
             .build()
         ));
 

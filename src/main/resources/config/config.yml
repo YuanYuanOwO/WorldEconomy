@@ -91,6 +91,27 @@ playerMessages:
       ), "&cNo world-groups found"),
       "&8&m                                                  "
     )
+  notInAnyWorldGroupSelf$: 'lut["MESSAGE_PREFIX"] & "&cYou''re currently not within any known world-group."'
+  # name: String
+  notInAnyWorldGroupOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &cis currently not within any known world-group."'
+  # name: String
+  unknownWorldGroup$: 'lut["MESSAGE_PREFIX"] & "&cCould not locate a world-group by the name of &4" & name & "&c."'
+  # label: String
+  usageBalanceCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
+  # label: String
+  # group_names: String
+  usageBalanceCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c] [player]"'
+  # holder: String
+  # balance: String
+  # group: String
+  balanceMessageSelf$: 'lut["MESSAGE_PREFIX"] & "&7Your balance in &e" & group & " &7is &e" & balance & "&7."'
+  # holder: String
+  # balance: String
+  # group: String
+  balanceMessageOther$: 'lut["MESSAGE_PREFIX"] & "&e" & holder & "''s &7balance in &e" & group & " &7is &e" & balance & "&7."'
+  missingPermissionBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to use the balance command."'
+  missingPermissionBalanceOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balance of others."'
+  playerOnlyBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
 
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'

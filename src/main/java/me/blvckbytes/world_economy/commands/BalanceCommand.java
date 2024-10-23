@@ -1,8 +1,9 @@
 package me.blvckbytes.world_economy.commands;
 
+import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.gpeee.GPEEE;
 import me.blvckbytes.world_economy.*;
-import org.bukkit.OfflinePlayer;
+import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,107 +19,155 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflineLocationReader offlineLocationReader;
   private final OfflinePlayerCache offlinePlayerCache;
+  private final ConfigKeeper<MainSection> config;
 
   public BalanceCommand(
     EconomyDataRegistry dataRegistry,
     WorldEconomyProvider economyProvider,
     WorldGroupRegistry worldGroupRegistry,
     OfflineLocationReader offlineLocationReader,
-    OfflinePlayerCache offlinePlayerCache
+    OfflinePlayerCache offlinePlayerCache,
+    ConfigKeeper<MainSection> config
   ) {
     this.dataRegistry = dataRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlineLocationReader = offlineLocationReader;
     this.offlinePlayerCache = offlinePlayerCache;
+    this.config = config;
   }
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCE.has(player)) {
-      player.sendMessage("§cNo permission for command");
+    if (!PluginPermission.COMMAND_BALANCE.has(sender)) {
+      sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalanceSelfCommand.stringify(
+        config.rootSection.builtBaseEnvironment
+      ));
+
       return true;
     }
 
-    OfflinePlayer target;
+    var canViewOthers = PluginPermission.COMMAND_BALANCE_OTHER.has(sender);
+
+    EconomyAccountRegistry targetRegistry;
+    WorldGroup targetWorldGroup;
+
+    if (args.length == 0 || args.length == 1) {
+      if (!(sender instanceof Player player)) {
+        sender.sendMessage(config.rootSection.playerMessages.playerOnlyBalanceSelfCommand.stringify(
+          config.rootSection.builtBaseEnvironment
+        ));
+
+        return true;
+      }
+
+      targetRegistry = dataRegistry.getAccountRegistry(player);
+
+      if (targetRegistry == null) {
+        sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountSelf.stringify(
+          config.rootSection.builtBaseEnvironment
+        ));
+
+        return true;
+      }
+    }
+
+    else if (args.length == 2) {
+      var targetPlayer = offlinePlayerCache.getByName(args[1]);
+
+      if (targetPlayer != sender && !canViewOthers) {
+        sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalanceOtherCommand.stringify(
+          config.rootSection.builtBaseEnvironment
+        ));
+
+        return true;
+      }
+
+      targetRegistry = dataRegistry.getAccountRegistry(targetPlayer);
+
+      if (targetRegistry == null) {
+        sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountOther.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("name", targetPlayer.getName())
+            .build()
+        ));
+
+        return true;
+      }
+    }
+
+    else {
+      if (!canViewOthers) {
+        sender.sendMessage(config.rootSection.playerMessages.usageBalanceCommandSelf.stringify(
+          config.rootSection.builtBaseEnvironment
+        ));
+
+        return true;
+      }
+
+      sender.sendMessage(config.rootSection.playerMessages.usageBalanceCommandOther.stringify(
+        config.rootSection.getBaseEnvironment()
+          .withStaticVariable("label", label)
+          .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
+          .build()
+      ));
+
+      return true;
+    }
 
     if (args.length == 0) {
-      if (!(sender instanceof Player player)) {
-        sender.sendMessage("§cCommand for players only");
-        return true;
-      }
+      targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(targetRegistry.getHolder());
 
-      target = player;
-    }
+      if (targetWorldGroup == null) {
+        sender.sendMessage(config.rootSection.playerMessages.notInAnyWorldGroupSelf.stringify(
+          config.rootSection.builtBaseEnvironment
+        ));
 
-    else if (args.length == 1 || args.length == 2) {
-      target = offlinePlayerCache.getByName(args[0]);
-
-      if (target != sender && sender instanceof Player player && !PluginPermission.COMMAND_BALANCE_OTHER.has(player)) {
-        player.sendMessage("§cNo permission for other");
         return true;
       }
     }
 
     else {
-      sender.sendMessage("§cUsage: /" + label + " [player]");
-      return true;
+      targetWorldGroup = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(args[0]);
+
+      if (targetWorldGroup == null) {
+        sender.sendMessage(config.rootSection.playerMessages.unknownWorldGroup.stringify(
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("name", args[0])
+            .build()
+        ));
+
+        return true;
+      }
     }
 
-    var accountRegistry = dataRegistry.getAccountRegistry(target);
-
-    if (accountRegistry == null) {
-      sender.sendMessage("§cAccount does not exist: " + target.getName());
-      return true;
-    }
-
-    WorldGroup targetWorldGroup;
-    boolean isLastLocation;
-
-    if (args.length == 2) {
-      targetWorldGroup = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(args[1]);
-      isLastLocation = false;
-    }
-
-    else {
-      targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(target);
-      isLastLocation = true;
-    }
-
-    if (targetWorldGroup == null) {
-      if (isLastLocation) {
-        if (target instanceof Player) {
-          sender.sendMessage("§cCurrent location of " + target.getName() + " is not within any of the known groups");
-        } else {
-          sender.sendMessage("§cLast location of " + target.getName() + " was not within any of the known groups");
-        }
-      } else
-        sender.sendMessage("World-Group " + args[1] + " could not be located");
-
-      return true;
-    }
-
-    var targetAccount = accountRegistry.getAccount(targetWorldGroup);
-
-    sender.sendMessage(
-      "§7Balance of §e" + target.getName() + "§7 in world-group §e" +
-      targetWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT) +
-      "§7 is: §e" + economyProvider.format(targetAccount.getBalance())
+    var message = (
+      targetRegistry.getHolder() == sender
+      ? config.rootSection.playerMessages.balanceMessageSelf
+      : config.rootSection.playerMessages.balanceMessageOther
     );
+
+    sender.sendMessage(message.stringify(
+      config.rootSection.getBaseEnvironment()
+        .withStaticVariable("holder", targetRegistry.getHolder().getName())
+        .withStaticVariable("balance", economyProvider.format(targetRegistry.getAccount(targetWorldGroup).getBalance()))
+        .withStaticVariable("group", targetWorldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT))
+        .build()
+    ));
 
     return true;
   }
 
   @Override
   public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-    if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCE_OTHER.has(player))
+    if (!PluginPermission.COMMAND_BALANCE.has(sender))
       return List.of();
 
     if (args.length == 1)
-      return offlinePlayerCache.createSuggestions(args[0]);
+      return worldGroupRegistry.createSuggestions(args[0]);
 
-    if (args.length == 2)
-      return worldGroupRegistry.createSuggestions(args[1]);
+    if (args.length == 2 && PluginPermission.COMMAND_BALANCE_OTHER.has(sender))
+      return offlinePlayerCache.createSuggestions(args[1]);
 
     return List.of();
   }

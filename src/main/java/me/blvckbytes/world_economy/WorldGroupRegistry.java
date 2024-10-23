@@ -35,8 +35,8 @@ public class WorldGroupRegistry {
     return Collections.unmodifiableCollection(worldGroupByIdentifierNameLower.values());
   }
 
-  public List<String> createSuggestions(String input) {
-    return worldGroupIdentifiers.stream().filter(it -> StringUtils.containsIgnoreCase(it, input)).toList();
+  public List<String> createSuggestions(@Nullable String input) {
+    return worldGroupIdentifiers.stream().filter(it -> input == null || StringUtils.containsIgnoreCase(it, input)).toList();
   }
 
   public @Nullable WorldGroup getWorldGroupByMemberNameIgnoreCase(String memberName) {
