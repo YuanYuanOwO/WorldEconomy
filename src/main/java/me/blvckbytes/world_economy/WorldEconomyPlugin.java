@@ -47,7 +47,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
       registerProvider(new WorldEconomyProvider(this, config, accountRegistry));
 
       setupCommands(config, List.of(
-        new Tuple<>(config.rootSection.commands.balance, new BalanceCommand()),
+        new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(accountRegistry, provider, worldGroupRegistry, offlineLocationReader)),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(accountRegistry, provider, worldGroupRegistry)),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand()),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand()),

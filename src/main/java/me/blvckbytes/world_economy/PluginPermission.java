@@ -6,6 +6,8 @@ public enum PluginPermission {
   COMMAND_RELOAD("command.reload"),
   COMMAND_BALANCES("command.balances"),
   COMMAND_BALANCES_OTHER("command.balances.other"),
+  COMMAND_BALANCE("command.balance"),
+  COMMAND_BALANCE_OTHER("command.balance.other"),
   ;
 
   private static final String PREFIX = "worldeconomy";

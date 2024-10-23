@@ -66,10 +66,8 @@ public class OfflineLocationReader implements Listener {
 
     result = worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName);
 
-    if (result == null) {
-      logger.severe("World \"" + worldName + "\" of player \"" + playerId + "\" could not be matched with an existing world-group");
+    if (result == null)
       return null;
-    }
 
     worldGroupByUuidCache.put(playerId, result);
     return result;
