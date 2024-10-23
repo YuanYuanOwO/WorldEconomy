@@ -25,6 +25,21 @@ public class EconomyAccountRegistry {
     this.balanceConstraint = balanceConstraint;
   }
 
+  public boolean isDirty() {
+    for (var account : accountByWorldGroup.values()) {
+      if (account.isDirty())
+        return true;
+    }
+
+    return false;
+  }
+
+  public void clearDirty() {
+    for (var account : accountByWorldGroup.values()) {
+      account.clearDirty();
+    }
+  }
+
   public OfflinePlayer getHolder() {
     return holder;
   }

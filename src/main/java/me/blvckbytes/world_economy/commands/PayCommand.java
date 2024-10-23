@@ -43,7 +43,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       return true;
     }
 
-    var sourceAccountRegistry = economyDataRegistry.getEconomyData(player);
+    var sourceAccountRegistry = economyDataRegistry.getAccountRegistry(player);
 
     if (sourceAccountRegistry == null) {
       player.sendMessage("§cCould not access your economy-data");
@@ -57,7 +57,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
 
     if (args.length == 2 || args.length == 3 || args.length == 4) {
       var targetPlayer = offlinePlayerCache.getByName(args[0]);
-      targetAccountRegistry = economyDataRegistry.getEconomyData(targetPlayer);
+      targetAccountRegistry = economyDataRegistry.getAccountRegistry(targetPlayer);
 
       if (targetAccountRegistry == null) {
         player.sendMessage("§cThe player " + targetPlayer.getName() + " is not known on this server");

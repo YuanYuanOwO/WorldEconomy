@@ -50,7 +50,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
       }
 
       var targetPlayer = offlinePlayerCache.getByName(args[1]);
-      accountRegistry = economyDataRegistry.getEconomyData(targetPlayer);
+      accountRegistry = economyDataRegistry.getAccountRegistry(targetPlayer);
 
       if (accountRegistry == null) {
         sender.sendMessage("§cPlayer " + targetPlayer.getName() + " is not known on this server");

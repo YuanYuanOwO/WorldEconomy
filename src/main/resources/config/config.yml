@@ -42,6 +42,7 @@ worldGroups:
       - world_the_end
 
 economy:
+  cacheWritePeriodSeconds: 30
   nameSingular: 'Euro'
   namePlural: 'Euros'
   startingBalance: 200.0

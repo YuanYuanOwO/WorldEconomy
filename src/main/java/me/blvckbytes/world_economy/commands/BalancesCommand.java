@@ -13,18 +13,18 @@ import java.util.List;
 
 public class BalancesCommand implements CommandExecutor, TabCompleter {
 
-  private final EconomyDataRegistry accountRegistry;
+  private final EconomyDataRegistry dataRegistry;
   private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflinePlayerCache offlinePlayerCache;
 
   public BalancesCommand(
-    EconomyDataRegistry accountRegistry,
+    EconomyDataRegistry dataRegistry,
     WorldEconomyProvider economyProvider,
     WorldGroupRegistry worldGroupRegistry,
     OfflinePlayerCache offlinePlayerCache
   ) {
-    this.accountRegistry = accountRegistry;
+    this.dataRegistry = dataRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlinePlayerCache = offlinePlayerCache;
@@ -62,9 +62,9 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
       return true;
     }
 
-    var economyData = accountRegistry.getEconomyData(target);
+    var accountRegistry = dataRegistry.getAccountRegistry(target);
 
-    if (economyData == null) {
+    if (accountRegistry == null) {
       sender.sendMessage("§cAccount does not exist: " + target.getName());
       return true;
     }
@@ -73,7 +73,7 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
 
     for (var worldGroup : worldGroupRegistry.getWorldGroups()) {
       var displayName = worldGroup.displayName().stringify(GPEEE.EMPTY_ENVIRONMENT);
-      var accountBalance = economyData.getAccount(worldGroup).getBalance();
+      var accountBalance = accountRegistry.getAccount(worldGroup).getBalance();
       sender.sendMessage(displayName + "§8: §e" + economyProvider.format(accountBalance));
     }
 

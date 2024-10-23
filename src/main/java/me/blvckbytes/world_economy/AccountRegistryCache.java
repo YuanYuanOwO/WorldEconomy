@@ -8,32 +8,40 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class EconomyDataCache {
-
-  // TODO: Test cache duration functionality
+public class AccountRegistryCache {
 
   private static final long OFFLINE_PLAYER_CACHE_DURATION_TICKS = 20 * 60 * 5;
 
   private final Plugin plugin;
   private final Function<OfflinePlayer, EconomyAccountRegistry> computer;
+  private final Consumer<EconomyAccountRegistry> removalHandler;
 
-  private final Map<UUID, EconomyAccountRegistry> playerDataByPlayerId;
+  private final Map<UUID, EconomyAccountRegistry> accountRegistryByPlayerId;
   private final Map<UUID, BukkitTask> deletionTaskByPlayerId;
 
-  public EconomyDataCache(Plugin plugin, Function<OfflinePlayer, EconomyAccountRegistry> computer) {
+  public AccountRegistryCache(
+    Plugin plugin,
+    Function<OfflinePlayer, EconomyAccountRegistry> computer,
+    Consumer<EconomyAccountRegistry> removalHandler
+  ) {
     this.plugin = plugin;
     this.computer = computer;
+    this.removalHandler = removalHandler;
 
-    this.playerDataByPlayerId = new HashMap<>();
+    this.accountRegistryByPlayerId = new HashMap<>();
     this.deletionTaskByPlayerId = new HashMap<>();
   }
 
   public @Nullable EconomyAccountRegistry remove(OfflinePlayer player) {
     synchronized (this) {
       var playerId = player.getUniqueId();
-      var result = playerDataByPlayerId.remove(playerId);
+      var result = accountRegistryByPlayerId.remove(playerId);
+
+      if (result != null)
+        this.removalHandler.accept(result);
 
       var existingTask = deletionTaskByPlayerId.remove(playerId);
 
@@ -47,13 +55,13 @@ public class EconomyDataCache {
   public EconomyAccountRegistry retrieveOrCompute(OfflinePlayer player) {
     synchronized (this) {
       var playerId = player.getUniqueId();
-      var playerData = playerDataByPlayerId.get(playerId);
+      var playerData = accountRegistryByPlayerId.get(playerId);
 
       if (playerData == null) {
         playerData = computer.apply(player);
 
         if (playerData != null)
-          playerDataByPlayerId.put(playerId, playerData);
+          accountRegistryByPlayerId.put(playerId, playerData);
       }
 
       touchData(player);
@@ -61,20 +69,26 @@ public class EconomyDataCache {
     }
   }
 
-  public Set<Map.Entry<UUID, EconomyAccountRegistry>> entries() {
-    return Collections.unmodifiableSet(playerDataByPlayerId.entrySet());
+  public Collection<EconomyAccountRegistry> values() {
+    synchronized (this) {
+      return Collections.unmodifiableCollection(accountRegistryByPlayerId.values());
+    }
   }
 
   public int size() {
-    return playerDataByPlayerId.size();
+    synchronized (this) {
+      return accountRegistryByPlayerId.size();
+    }
   }
 
   public void clear() {
-    this.playerDataByPlayerId.clear();
+    synchronized (this) {
+      this.accountRegistryByPlayerId.clear();
 
-    for (var taskIterator = deletionTaskByPlayerId.entrySet().iterator(); taskIterator.hasNext();) {
-      taskIterator.next().getValue().cancel();
-      taskIterator.remove();
+      for (var taskIterator = deletionTaskByPlayerId.entrySet().iterator(); taskIterator.hasNext(); ) {
+        taskIterator.next().getValue().cancel();
+        taskIterator.remove();
+      }
     }
   }
 

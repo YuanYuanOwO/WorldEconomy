@@ -18,6 +18,7 @@ public class EconomySection extends AConfigSection {
   public @Nullable Double minMoney;
   public @Nullable Double minPayAmount;
   public boolean doClampOnLoad;
+  public long cacheWritePeriodSeconds;
 
   @CSAlways
   public NumberFormatSection currencyFormat;
@@ -44,5 +45,8 @@ public class EconomySection extends AConfigSection {
 
     if (minPayAmount != null && minPayAmount < 0 )
       throw new MappingError("The minimum pay-amount cannot be less than zero");
+
+    if (cacheWritePeriodSeconds < 15)
+      throw new MappingError("The cache write period cannot be below 15s, as to not cause needless lag");
   }
 }

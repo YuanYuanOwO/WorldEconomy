@@ -13,20 +13,20 @@ import java.util.List;
 
 public class BalanceCommand implements CommandExecutor, TabCompleter {
 
-  private final EconomyDataRegistry accountRegistry;
+  private final EconomyDataRegistry dataRegistry;
   private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflineLocationReader offlineLocationReader;
   private final OfflinePlayerCache offlinePlayerCache;
 
   public BalanceCommand(
-    EconomyDataRegistry accountRegistry,
+    EconomyDataRegistry dataRegistry,
     WorldEconomyProvider economyProvider,
     WorldGroupRegistry worldGroupRegistry,
     OfflineLocationReader offlineLocationReader,
     OfflinePlayerCache offlinePlayerCache
   ) {
-    this.accountRegistry = accountRegistry;
+    this.dataRegistry = dataRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlineLocationReader = offlineLocationReader;
@@ -65,9 +65,9 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
       return true;
     }
 
-    var economyData = accountRegistry.getEconomyData(target);
+    var accountRegistry = dataRegistry.getAccountRegistry(target);
 
-    if (economyData == null) {
+    if (accountRegistry == null) {
       sender.sendMessage("§cAccount does not exist: " + target.getName());
       return true;
     }
@@ -98,7 +98,7 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
       return true;
     }
 
-    var targetAccount = economyData.getAccount(targetWorldGroup);
+    var targetAccount = accountRegistry.getAccount(targetWorldGroup);
 
     sender.sendMessage(
       "§7Balance of §e" + target.getName() + "§7 in world-group §e" +

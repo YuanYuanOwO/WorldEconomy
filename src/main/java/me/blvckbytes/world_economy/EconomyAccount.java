@@ -3,6 +3,8 @@ package me.blvckbytes.world_economy;
 public class EconomyAccount {
 
   private double balance;
+  private boolean dirty;
+
   private final BalanceConstraint balanceConstraint;
 
   public EconomyAccount(
@@ -31,6 +33,7 @@ public class EconomyAccount {
         return false;
 
       balance -= value;
+      dirty = true;
       return true;
     }
   }
@@ -41,6 +44,7 @@ public class EconomyAccount {
         return false;
 
       balance += value;
+      dirty = true;
       return true;
     }
   }
@@ -51,7 +55,16 @@ public class EconomyAccount {
         return false;
 
       balance = value;
+      dirty = true;
       return true;
     }
+  }
+
+  public boolean isDirty() {
+    return dirty;
+  }
+
+  public void clearDirty() {
+    this.dirty = false;
   }
 }

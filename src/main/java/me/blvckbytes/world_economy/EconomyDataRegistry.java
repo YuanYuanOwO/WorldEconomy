@@ -3,6 +3,7 @@ package me.blvckbytes.world_economy;
 import com.google.gson.*;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,13 +17,10 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EconomyDataRegistry implements BalanceConstraint, Listener {
-
-  // TODO: Decide when to store - currently only on quit or shutdown (not even cache-timeout!)
 
   private static final Gson GSON_INSTANCE = new GsonBuilder()
     .setPrettyPrinting()
@@ -34,12 +32,13 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     )
     .create();
 
+  private final Plugin plugin;
   private final File playersFolder;
   private final OfflineLocationReader offlineLocationReader;
   private final WorldGroupRegistry worldGroupRegistry;
   private final ConfigKeeper<MainSection> config;
   private final Logger logger;
-  private final EconomyDataCache economyDataCache;
+  private final AccountRegistryCache accountRegistryCache;
 
   public EconomyDataRegistry(
     Plugin plugin,
@@ -58,27 +57,39 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
         throw new IllegalStateException("Could not create directories for path " + playersFolder);
     }
 
+    this.plugin = plugin;
     this.offlineLocationReader = offlineLocationReader;
     this.worldGroupRegistry = worldGroupRegistry;
     this.config = config;
     this.logger = logger;
 
-    this.economyDataCache = new EconomyDataCache(plugin, this::loadPlayerFile);
+    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadPlayerFile, this::storePlayerFile);
 
     // Could have re-configured the min/max/doClamp values, so clamping could be necessary
     // Same holds true for the world-groups, which would have to be re-evaluated when loading
     config.registerReloadListener(this::writeAndClearCache);
+
+    invokeNextWritePeriod();
+  }
+
+  private void invokeNextWritePeriod() {
+    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+      for (var accountRegistry : accountRegistryCache.values())
+        storePlayerFile(accountRegistry);
+
+      invokeNextWritePeriod();
+    }, config.rootSection.economy.cacheWritePeriodSeconds * 20);
   }
 
   // ================================================================================
   // Public API
   // ================================================================================
 
-  public @Nullable EconomyAccountRegistry getEconomyData(OfflinePlayer player) {
+  public @Nullable EconomyAccountRegistry getAccountRegistry(OfflinePlayer player) {
     if (!player.hasPlayedBefore())
       return null;
 
-    return economyDataCache.retrieveOrCompute(player);
+    return accountRegistryCache.retrieveOrCompute(player);
   }
 
   public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
@@ -91,7 +102,7 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
       if (worldGroup == null)
         return null;
 
-      return economyDataCache.retrieveOrCompute(player).getAccount(worldGroup);
+      return accountRegistryCache.retrieveOrCompute(player).getAccount(worldGroup);
     }
   }
 
@@ -105,7 +116,7 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
       if (worldGroup == null)
         return null;
 
-      return economyDataCache.retrieveOrCompute(player).getAccount(worldGroup);
+      return accountRegistryCache.retrieveOrCompute(player).getAccount(worldGroup);
     }
   }
 
@@ -137,12 +148,12 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
   }
 
   public void writeAndClearCache() {
-    logger.info("Storing " + economyDataCache.size() + " player-data entries from cache");
+    logger.info("Storing " + accountRegistryCache.size() + " player-data entries from cache");
 
-    for (var playerDataEntry : economyDataCache.entries())
-      storePlayerFile(playerDataEntry.getKey(), playerDataEntry.getValue());
+    for (var accountRegistry : accountRegistryCache.values())
+      storePlayerFile(accountRegistry);
 
-    economyDataCache.clear();
+    accountRegistryCache.clear();
     logger.info("Write-process complete");
   }
 
@@ -152,17 +163,21 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event) {
-    var economyData = economyDataCache.remove(event.getPlayer());
+    var accountRegistry = accountRegistryCache.remove(event.getPlayer());
 
-    if (economyData != null)
-      storePlayerFile(event.getPlayer().getUniqueId(), economyData);
+    if (accountRegistry != null)
+      storePlayerFile(accountRegistry);
   }
 
   // ================================================================================
   // File-Persistence
   // ================================================================================
 
-  private void storePlayerFile(UUID playerId, EconomyAccountRegistry data) {
+  private void storePlayerFile(EconomyAccountRegistry accountRegistry) {
+    if (!accountRegistry.isDirty())
+      return;
+
+    var playerId = accountRegistry.getHolder().getUniqueId();
     var playerFile = new File(playersFolder, playerId + ".json");
 
     if (!playerFile.exists()) {
@@ -176,12 +191,13 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     }
 
     try {
-      var fileContents = GSON_INSTANCE.toJson(data.toScalarMap());
+      var fileContents = GSON_INSTANCE.toJson(accountRegistry.toScalarMap());
 
       try (
         var fileWriter = new FileWriter(playerFile, false)
       ) {
         fileWriter.write(fileContents);
+        accountRegistry.clearDirty();
       }
     } catch (Exception storeException) {
       logger.log(Level.SEVERE, "Could not store player-data to player-file " + playerFile, storeException);
