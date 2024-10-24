@@ -1,7 +1,6 @@
 package me.blvckbytes.world_economy.commands;
 
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
-import me.blvckbytes.gpeee.GPEEE;
 import me.blvckbytes.world_economy.*;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.command.Command;

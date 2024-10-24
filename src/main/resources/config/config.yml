@@ -47,6 +47,7 @@ economy:
   cacheWritePeriodSeconds: 30
   # For how long to keep accounts of offline-players in memory
   offlinePlayerCacheSeconds: 300
+  topListSize: 5
   nameSingular: 'Euro'
   namePlural: 'Euros'
   startingBalance: 200.0
@@ -189,6 +190,25 @@ playerMessages:
   moneyCommandRemoveTarget$: 'lut["MESSAGE_PREFIX"] & "&e" & executor_name & " &7has removed &c" & amount & " &7from your account in &e" & group & "&7; new balance: &e" & target_new_balance'
   moneyCommandSetTarget$: 'lut["MESSAGE_PREFIX"] & "&e" & executor_name & " &7has set your balance to &e" & amount & " &7in &e" & group & "&7."'
 
+  missingPermissionCommandBalTop$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the baltop command."'
+  playerOnlyBalTopCommandNoWorldGroup$: 'lut["MESSAGE_PREFIX"] & "&cOnly players can use the baltop-command without specifying a world-group."'
+  missingPermissionCommandBalTopOtherGroups$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to specify other world-groups on the baltop command."'
+  # label: String
+  usageBalTopCommand$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
+  # label: String
+  # group_names: List<String>
+  usageBalTopCommandOtherGroups$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c]"'
+  # group: String
+  # entries: Map<String, String>
+  balTopScreen$: |
+    flatten(
+      "&8&m                                                  ",
+      "&7Top balances of &e" & group & "&7:",
+      map(entries, (entry, index) => (
+        "&8- &7#" & (index + 1) & " " & key(entry) & "&7: &e" & value(entry)
+      ), "&cNo top-list entries"),
+      "&8&m                                                  "
+    )
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'
   pluginReloadedError$: '@{MESSAGE-PLUGIN-RELOAD-ERROR(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionReloadCommand$: '@{MESSAGE-MISSING-PERMISSION-RELOAD-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'

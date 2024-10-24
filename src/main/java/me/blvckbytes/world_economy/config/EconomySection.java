@@ -20,6 +20,7 @@ public class EconomySection extends AConfigSection {
   public boolean doClampOnLoad;
   public long cacheWritePeriodSeconds;
   public long offlinePlayerCacheSeconds;
+  public int topListSize;
 
   @CSAlways
   public NumberFormatSection currencyFormat;
@@ -55,5 +56,8 @@ public class EconomySection extends AConfigSection {
 
     if (offlinePlayerCacheSeconds < 15)
       throw new MappingError("The offline-player cache duration cannot be below 15s, as to not cause needless lag");
+
+    if (topListSize <= 0)
+      throw new MappingError("The top-list size must be strictly positive");
   }
 }

@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,7 +64,7 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     this.config = config;
     this.logger = logger;
 
-    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadPlayerFile, this::storePlayerFile, config);
+    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadAccountRegistry, this::storePlayerFile, config);
 
     // Could have re-configured the min/max/doClamp values, so clamping could be necessary
     // Same holds true for the world-groups, which would have to be re-evaluated when loading
@@ -173,6 +174,76 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
   // File-Persistence
   // ================================================================================
 
+  public void forEachPlayerDataFile(Consumer<File> consumer) {
+    var playerFiles = playersFolder.listFiles();
+
+    if (playerFiles == null)
+      return;
+
+    for (var playerFile : playerFiles) {
+      if (!playerFile.isFile())
+        continue;
+
+      if (!playerFile.getName().endsWith(".json"))
+        continue;
+
+      consumer.accept(playerFile);
+    }
+  }
+
+  public @Nullable HashMap<WorldGroup, EconomyAccount> loadPlayerFile(File playerFile) {
+    if (!playerFile.isFile())
+      return null;
+
+    try (
+      var fileReader = new FileReader(playerFile)
+    ) {
+      var playerFileObject = GSON_INSTANCE.fromJson(fileReader, JsonObject.class);
+      var result = new HashMap<WorldGroup, EconomyAccount>();
+
+      for (var objectEntry : playerFileObject.entrySet()) {
+        var worldGroupName = objectEntry.getKey();
+
+        if (!(
+          objectEntry.getValue() instanceof JsonPrimitive value && value.isNumber()
+        )) {
+          logger.log(Level.SEVERE, "Value of world-group \"" + worldGroupName + "\" of \"" + playerFile + "\" is not a number; skipping");
+          continue;
+        }
+
+        var worldGroup = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(worldGroupName);
+
+        if (worldGroup == null) {
+          logger.log(Level.WARNING, "World-group \"" + worldGroupName + "\" of \"" + playerFile + "\" could not be matched with an existing world-group; skipping");
+          continue;
+        }
+
+        var balance = value.getAsDouble();
+
+        if (config.rootSection.economy.doClampOnLoad)
+          balance = clampValue(balance);
+
+        result.put(worldGroup, new EconomyAccount(balance, this));
+      }
+
+      return result;
+    } catch (Exception loadException) {
+      logger.log(Level.SEVERE, "Encountered corrupted player-file " + playerFile + "; copying to .bak and deleting", loadException);
+
+      try {
+        Files.copy(
+          playerFile.toPath(),
+          new File(playersFolder, playerFile.getName() + ".bak").toPath(),
+          StandardCopyOption.REPLACE_EXISTING
+        );
+      } catch (Exception copyException) {
+        logger.log(Level.SEVERE, "Could not make a backup of " + playerFile + " by copying to .bak and starting anew", copyException);
+      }
+
+      return new HashMap<>();
+    }
+  }
+
   private void storePlayerFile(EconomyAccountRegistry accountRegistry) {
     if (!accountRegistry.isDirty())
       return;
@@ -204,60 +275,11 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     }
   }
 
-  private EconomyAccountRegistry loadPlayerFile(OfflinePlayer player) {
+  private EconomyAccountRegistry loadAccountRegistry(OfflinePlayer player) {
     var playerId = player.getUniqueId();
     var playerFile = new File(playersFolder, playerId + ".json");
-
-    if (!playerFile.isFile())
-      return new EconomyAccountRegistry(player, new HashMap<>(), config, this);
-
-    try (
-      var fileReader = new FileReader(playerFile)
-    ) {
-      var playerFileObject = GSON_INSTANCE.fromJson(fileReader, JsonObject.class);
-      var result = new HashMap<WorldGroup, EconomyAccount>();
-
-      for (var objectEntry : playerFileObject.entrySet()) {
-        var worldGroupName = objectEntry.getKey();
-
-        if (!(
-          objectEntry.getValue() instanceof JsonPrimitive value && value.isNumber()
-        )) {
-          logger.log(Level.SEVERE, "Value of world-group \"" + worldGroupName + "\" for player \"" + playerId + "\" is not a number; skipping");
-          continue;
-        }
-
-        var worldGroup = worldGroupRegistry.getWorldGroupByIdentifierNameIgnoreCase(worldGroupName);
-
-        if (worldGroup == null) {
-          logger.log(Level.WARNING, "World-group \"" + worldGroupName + "\" for player \"" + playerId + "\" could not be matched with an existing world-group; skipping");
-          continue;
-        }
-
-        var balance = value.getAsDouble();
-
-        if (config.rootSection.economy.doClampOnLoad)
-          balance = clampValue(balance);
-
-        result.put(worldGroup, new EconomyAccount(balance, this));
-      }
-
-      return new EconomyAccountRegistry(player, result, config, this);
-    } catch (Exception loadException) {
-      logger.log(Level.SEVERE, "Encountered corrupted player-file " + playerFile + "; copying to .bak and deleting", loadException);
-
-      try {
-        Files.copy(
-          playerFile.toPath(),
-          new File(playersFolder, playerId + ".json.bak").toPath(),
-          StandardCopyOption.REPLACE_EXISTING
-        );
-      } catch (Exception copyException) {
-        logger.log(Level.SEVERE, "Could not make a backup of " + playerFile + " by copying to .bak and starting anew", copyException);
-      }
-
-      return new EconomyAccountRegistry(player, new HashMap<>(), config, this);
-    }
+    var dataMap = loadPlayerFile(playerFile);
+    return new EconomyAccountRegistry(player, dataMap, config, this);
   }
 
   private double clampValue(double value) {

@@ -56,6 +56,13 @@ public class PlayerMessagesSection extends AConfigSection {
   public BukkitEvaluable moneyCommandRemoveTarget;
   public BukkitEvaluable moneyCommandSetTarget;
 
+  public BukkitEvaluable missingPermissionCommandBalTop;
+  public BukkitEvaluable playerOnlyBalTopCommandNoWorldGroup;
+  public BukkitEvaluable missingPermissionCommandBalTopOtherGroups;
+  public BukkitEvaluable usageBalTopCommand;
+  public BukkitEvaluable usageBalTopCommandOtherGroups;
+  public BukkitEvaluable balTopScreen;
+
   public BukkitEvaluable pluginReloadedSuccess;
   public BukkitEvaluable pluginReloadedError;
 

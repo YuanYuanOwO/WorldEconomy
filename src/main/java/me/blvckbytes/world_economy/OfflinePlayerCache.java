@@ -2,9 +2,11 @@ package me.blvckbytes.world_economy;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.*;
@@ -14,11 +16,13 @@ public class OfflinePlayerCache implements Listener {
   private final Set<String> knownPlayerNames;
   private final Map<String, OfflinePlayer> offlinePlayerByLowerName;
   private final Map<UUID, String> offlinePlayerLowerNameByUuid;
+  private final Map<UUID, OfflinePlayer> offlinePlayerById;
 
   public OfflinePlayerCache() {
     this.knownPlayerNames = new HashSet<>();
     this.offlinePlayerByLowerName = new WeakHashMap<>();
     this.offlinePlayerLowerNameByUuid = new HashMap<>();
+    this.offlinePlayerById = new HashMap<>();
 
     for (var player : Bukkit.getOfflinePlayers())
       knownPlayerNames.add(player.getName());
@@ -41,12 +45,21 @@ public class OfflinePlayerCache implements Listener {
     return result;
   }
 
+  public OfflinePlayer getById(UUID id) {
+    return offlinePlayerById.computeIfAbsent(id, Bukkit::getOfflinePlayer);
+  }
+
   public List<String> createSuggestions(String input) {
     return knownPlayerNames
       .stream()
       .filter(name -> StringUtils.containsIgnoreCase(name, input))
       .limit(20)
       .toList();
+  }
+
+  @EventHandler
+  public void onChat(AsyncPlayerChatEvent event) {
+    event.setMessage(ChatColor.translateAlternateColorCodes('&', event.getMessage()));
   }
 
   @EventHandler

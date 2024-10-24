@@ -47,6 +47,8 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
       registerProvider(new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache));
 
+      var topListRegistry = new TopListRegistry(economyDataRegistry, offlinePlayerCache, config, logger);
+
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(
           economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache, config
@@ -55,7 +57,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
           economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache, config
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
-          offlineLocationReader, worldGroupRegistry
+          offlineLocationReader, worldGroupRegistry, topListRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
           offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider, config
