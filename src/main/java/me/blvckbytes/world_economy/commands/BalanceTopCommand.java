@@ -61,9 +61,14 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
       targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
 
       if (targetWorldGroup == null) {
-        // TODO: Add name of current world to evaluation-environment on all uses
-        if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null)
-          message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
+        if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
+          message.sendMessage(
+            sender,
+            config.rootSection.getBaseEnvironment()
+              .withStaticVariable("current_world", player.getWorld().getName())
+              .build()
+          );
+        }
 
         return true;
       }

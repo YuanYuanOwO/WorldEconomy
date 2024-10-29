@@ -169,8 +169,14 @@ public class PayCommand implements CommandExecutor, TabCompleter {
         sourceWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
 
         if (sourceWorldGroup == null) {
-          if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null)
-            message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
+          if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
+            message.sendMessage(
+              sender,
+              config.rootSection.getBaseEnvironment()
+                .withStaticVariable("current_world", player.getWorld().getName())
+                .build()
+            );
+          }
 
           return true;
         }

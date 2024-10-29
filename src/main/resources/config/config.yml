@@ -96,7 +96,8 @@ playerMessages:
       ), "&cNo world-groups found"),
       "&8&m                                                  "
     )
-  notInAnyWorldGroupSelf$: 'lut["MESSAGE_PREFIX"] & "&cYou''re currently not within any known world-group."'
+  # current_world: String
+  notInAnyWorldGroupSelf$: 'lut["MESSAGE_PREFIX"] & "&cYou''re currently not within any known world-group (world \"" & current_world & "\")."'
   # name: String
   notInAnyWorldGroupOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &cis currently not within any known world-group."'
   # name: String

@@ -102,8 +102,14 @@ public class BalanceCommand implements CommandExecutor, TabCompleter {
       targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(targetPlayer);
 
       if (targetWorldGroup == null) {
-        if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null)
-          message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
+        if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
+          message.sendMessage(
+            sender,
+            config.rootSection.getBaseEnvironment()
+              .withStaticVariable("current_world", ((Player) sender).getWorld().getName())
+              .build()
+          );
+        }
 
         return true;
       }
