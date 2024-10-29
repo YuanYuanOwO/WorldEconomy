@@ -27,6 +27,8 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable cannotPaySelf;
   public @Nullable BukkitEvaluable cannotPayCrossWorldGroups;
   public @Nullable BukkitEvaluable usagePayCommand;
+  public @Nullable BukkitEvaluable usagePayTargetCommand;
+  public @Nullable BukkitEvaluable usagePaySourceCommand;
   public @Nullable BukkitEvaluable missingPermissionCommandPayTarget;
   public @Nullable BukkitEvaluable missingPermissionCommandPaySource;
 

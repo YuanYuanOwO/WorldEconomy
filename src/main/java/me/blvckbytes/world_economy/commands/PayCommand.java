@@ -178,8 +178,15 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     }
 
     else {
-      // TODO: Have separate usages based on permissions
-      if ((message = config.rootSection.playerMessages.usagePayCommand) != null) {
+      // /pay <player> <amount> [target] [source]
+      if (PluginPermission.COMMAND_PAY_SOURCE.has(sender))
+        message = config.rootSection.playerMessages.usagePaySourceCommand;
+      else if (PluginPermission.COMMAND_PAY_TARGET.has(sender))
+        message = config.rootSection.playerMessages.usagePayTargetCommand;
+      else
+        message = config.rootSection.playerMessages.usagePayCommand;
+
+      if (message != null) {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()

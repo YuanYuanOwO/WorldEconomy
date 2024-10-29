@@ -90,23 +90,18 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
         return true;
       }
     } else {
-      if (canSpecifyGroup) {
-        if ((message = config.rootSection.playerMessages.usageBalTopCommandOtherGroups) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("label", label)
-              .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
-              .build()
-          );
-        }
-      }
+      message = (
+        canSpecifyGroup
+        ? config.rootSection.playerMessages.usageBalTopCommandOtherGroups
+        : config.rootSection.playerMessages.usageBalTopCommand
+      );
 
-      if ((message = config.rootSection.playerMessages.usageBalTopCommand) != null) {
+      if (message != null) {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()
             .withStaticVariable("label", label)
+            .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
             .build()
         );
       }

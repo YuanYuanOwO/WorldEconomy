@@ -124,6 +124,11 @@ playerMessages:
   # label: String
   # group_names: String
   usagePayCommand$: |
+    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount>"
+  usagePayTargetCommand$: |
+    names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
+    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> [target group: " & names_string & "&c]"
+  usagePaySourceCommand$: |
     names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
     lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> [target group: " & names_string & "&c] [source group: " & names_string & "&c]"
   missingPermissionCommandPayTarget$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom target world-group."'
