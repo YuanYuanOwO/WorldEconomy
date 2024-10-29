@@ -5,9 +5,6 @@ import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,12 +13,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.function.Consumer;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EconomyDataRegistry implements BalanceConstraint, Listener {
+public class EconomyDataRegistry implements BalanceConstraint {
 
   private static final Gson GSON_INSTANCE = new GsonBuilder()
     .setPrettyPrinting()
@@ -36,14 +32,17 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
   private final Plugin plugin;
   private final File playersFolder;
   private final OfflineLocationReader offlineLocationReader;
+  private final OfflinePlayerCache offlinePlayerCache;
   private final WorldGroupRegistry worldGroupRegistry;
   private final ConfigKeeper<MainSection> config;
   private final Logger logger;
-  private final AccountRegistryCache accountRegistryCache;
+
+  private final Map<WorldGroup, EconomyAccountRegistry> accountRegistryByWorldGroup;
 
   public EconomyDataRegistry(
     Plugin plugin,
     OfflineLocationReader offlineLocationReader,
+    OfflinePlayerCache offlinePlayerCache,
     WorldGroupRegistry worldGroupRegistry,
     ConfigKeeper<MainSection> config,
     Logger logger
@@ -60,64 +59,130 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
 
     this.plugin = plugin;
     this.offlineLocationReader = offlineLocationReader;
+    this.offlinePlayerCache = offlinePlayerCache;
     this.worldGroupRegistry = worldGroupRegistry;
     this.config = config;
     this.logger = logger;
 
-    this.accountRegistryCache = new AccountRegistryCache(plugin, this::loadAccountRegistry, this::storePlayerFile, config);
+    this.accountRegistryByWorldGroup = new HashMap<>();
 
-    // Could have re-configured the min/max/doClamp values, so clamping could be necessary
-    // Same holds true for the world-groups, which would have to be re-evaluated when loading
-    config.registerReloadListener(this::writeAndClearCache);
+    var numberOfLoadedFiles = loadAllFiles();
+    logger.info("Loaded " + numberOfLoadedFiles + " player-files");
 
     invokeNextWritePeriod();
   }
 
   private void invokeNextWritePeriod() {
     Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-      for (var accountRegistry : accountRegistryCache.values())
-        storePlayerFile(accountRegistry);
-
+      writeDirtyAccounts();
       invokeNextWritePeriod();
     }, config.rootSection.economy.cacheWritePeriodSeconds * 20);
+  }
+
+  public EconomyAccountRegistry getAccountRegistry(WorldGroup worldGroup) {
+    return accountRegistryByWorldGroup.computeIfAbsent(worldGroup, key ->
+      new EconomyAccountRegistry(worldGroup, config, this)
+    );
+  }
+
+  public void writeDirtyAccounts() {
+    var accountRegistries = accountRegistryByWorldGroup.values();
+
+    for (var accountRegistry : accountRegistries) {
+      for (var account : accountRegistry.getAccounts()) {
+        if (!account.isDirty())
+          continue;
+
+        var accounts = new ArrayList<EconomyAccount>();
+
+        for (var _accountRegistry : accountRegistries) {
+          var _account = _accountRegistry.getAccount(account.holder);
+
+          if (_account == null)
+            continue;
+
+          _account.clearDirty();
+          accounts.add(_account);
+        }
+
+        storePlayerFile(account.holder, accounts);
+      }
+    }
+  }
+
+  private int loadAllFiles() {
+    var playerFiles = playersFolder.listFiles();
+
+    if (playerFiles == null)
+      return 0;
+
+    var loadedPlayerFileCount = 0;
+
+    for (var playerFile : playerFiles) {
+      if (!playerFile.isFile())
+        continue;
+
+      if (!playerFile.getName().endsWith(".json"))
+        continue;
+
+      var fileName = playerFile.getName();
+      var dotIndex = fileName.lastIndexOf('.');
+
+      if (dotIndex < 0)
+        continue;
+
+      var fileNameWithoutExtension = fileName.substring(0, dotIndex);
+
+      UUID playerId;
+
+      try {
+        playerId = UUID.fromString(fileNameWithoutExtension);
+      } catch (Exception e) {
+        continue;
+      }
+
+      var holder = offlinePlayerCache.getById(playerId);
+      var playerData = loadPlayerFile(playerFile, holder);
+
+      if (playerData == null)
+        continue;
+
+      for (var dataEntry : playerData.entrySet()) {
+        var accountRegistry = getAccountRegistry(dataEntry.getKey());
+        accountRegistry.registerAccount(holder, dataEntry.getValue());
+      }
+
+      ++loadedPlayerFileCount;
+    }
+
+    return loadedPlayerFileCount;
   }
 
   // ================================================================================
   // Public API
   // ================================================================================
 
-  public @Nullable EconomyAccountRegistry getAccountRegistry(OfflinePlayer player) {
-    if (!player.hasPlayedBefore())
-      return null;
-
-    return accountRegistryCache.retrieveOrCompute(player);
-  }
-
   public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
-    if (!player.hasPlayedBefore())
-      return null;
-
     synchronized (this) {
       var worldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
 
       if (worldGroup == null)
         return null;
 
-      return accountRegistryCache.retrieveOrCompute(player).getAccount(worldGroup);
+      var accountRegistry = accountRegistryByWorldGroup.get(worldGroup);
+      return accountRegistry.getAccount(player);
     }
   }
 
   public @Nullable EconomyAccount getForWorldName(OfflinePlayer player, String worldName) {
-    if (!player.hasPlayedBefore())
-      return null;
-
     synchronized (this) {
       var worldGroup = worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName);
 
       if (worldGroup == null)
         return null;
 
-      return accountRegistryCache.retrieveOrCompute(player).getAccount(worldGroup);
+      var accountRegistry = accountRegistryByWorldGroup.get(worldGroup);
+      return accountRegistry.getAccount(player);
     }
   }
 
@@ -148,52 +213,16 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     return true;
   }
 
-  public void writeAndClearCache() {
-    logger.info("Storing " + accountRegistryCache.size() + " player-data entries from cache");
-
-    for (var accountRegistry : accountRegistryCache.values())
-      storePlayerFile(accountRegistry);
-
-    accountRegistryCache.clear();
-    logger.info("Write-process complete");
-  }
-
-  // ================================================================================
-  // Event-Handlers
-  // ================================================================================
-
-  @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    var accountRegistry = accountRegistryCache.remove(event.getPlayer());
-
-    if (accountRegistry != null)
-      storePlayerFile(accountRegistry);
-  }
-
   // ================================================================================
   // File-Persistence
   // ================================================================================
 
-  public void forEachPlayerDataFile(Consumer<File> consumer) {
-    var playerFiles = playersFolder.listFiles();
-
-    if (playerFiles == null)
-      return;
-
-    for (var playerFile : playerFiles) {
-      if (!playerFile.isFile())
-        continue;
-
-      if (!playerFile.getName().endsWith(".json"))
-        continue;
-
-      consumer.accept(playerFile);
-    }
-  }
-
-  public @Nullable HashMap<WorldGroup, EconomyAccount> loadPlayerFile(File playerFile) {
+  public @Nullable HashMap<WorldGroup, EconomyAccount> loadPlayerFile(File playerFile, OfflinePlayer holder) {
     if (!playerFile.isFile())
       return null;
+
+    // TODO: Remove this debug-line
+    logger.info("Loaded player-file for " + holder.getUniqueId() + " (" + holder.getName() + ")");
 
     try (
       var fileReader = new FileReader(playerFile)
@@ -223,7 +252,7 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
         if (config.rootSection.economy.doClampOnLoad)
           balance = clampValue(balance);
 
-        result.put(worldGroup, new EconomyAccount(balance, this));
+        result.put(worldGroup, new EconomyAccount(holder, worldGroup, balance, this));
       }
 
       return result;
@@ -244,11 +273,11 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
     }
   }
 
-  private void storePlayerFile(EconomyAccountRegistry accountRegistry) {
-    if (!accountRegistry.isDirty())
-      return;
+  private void storePlayerFile(OfflinePlayer holder, Collection<EconomyAccount> accounts) {
+    // TODO: Remove this debug-line
+    logger.info("Written player-file for " + holder.getUniqueId() + " (" + holder.getName() + ")");
 
-    var playerId = accountRegistry.getHolder().getUniqueId();
+    var playerId = holder.getUniqueId();
     var playerFile = new File(playersFolder, playerId + ".json");
 
     if (!playerFile.exists()) {
@@ -261,25 +290,22 @@ public class EconomyDataRegistry implements BalanceConstraint, Listener {
       }
     }
 
+    var dataMap = new HashMap<String, Double>();
+
+    for (var account : accounts)
+      dataMap.put(account.worldGroup.identifierNameLower(), account.getBalance());
+
     try {
-      var fileContents = GSON_INSTANCE.toJson(accountRegistry.toScalarMap());
+      var fileContents = GSON_INSTANCE.toJson(dataMap);
 
       try (
         var fileWriter = new FileWriter(playerFile, false)
       ) {
         fileWriter.write(fileContents);
-        accountRegistry.clearDirty();
       }
     } catch (Exception storeException) {
       logger.log(Level.SEVERE, "Could not store player-data to player-file " + playerFile, storeException);
     }
-  }
-
-  private EconomyAccountRegistry loadAccountRegistry(OfflinePlayer player) {
-    var playerId = player.getUniqueId();
-    var playerFile = new File(playersFolder, playerId + ".json");
-    var dataMap = loadPlayerFile(playerFile);
-    return new EconomyAccountRegistry(player, dataMap, config, this);
   }
 
   private double clampValue(double value) {

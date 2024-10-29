@@ -17,12 +17,14 @@ public class WorldGroupSection extends AConfigSection {
     super(baseEnvironment);
 
     this.members = List.of();
-    this.displayName = BukkitEvaluable.UNDEFINED_STRING;
   }
 
   @Override
   public void afterParsing(List<Field> fields) throws Exception {
     super.afterParsing(fields);
+
+    if (displayName == null)
+      throw new MappingError("Key \"displayName\" cannot be absent");
 
     for (var member : members) {
       if (member.contains(" "))

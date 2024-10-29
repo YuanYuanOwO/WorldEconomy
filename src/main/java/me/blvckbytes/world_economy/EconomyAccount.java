@@ -1,16 +1,28 @@
 package me.blvckbytes.world_economy;
 
+import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.Nullable;
+
 public class EconomyAccount {
 
   private double balance;
   private boolean dirty;
 
+  public @Nullable Runnable afterBalanceUpdate;
+
+  public final OfflinePlayer holder;
+  public final WorldGroup worldGroup;
+
   private final BalanceConstraint balanceConstraint;
 
   public EconomyAccount(
+    OfflinePlayer holder,
+    WorldGroup worldGroup,
     double balance,
     BalanceConstraint balanceConstraint
   ) {
+    this.holder = holder;
+    this.worldGroup = worldGroup;
     this.balance = balance;
     this.balanceConstraint = balanceConstraint;
   }
@@ -33,7 +45,7 @@ public class EconomyAccount {
         return false;
 
       balance -= value;
-      dirty = true;
+      markDirty();
       return true;
     }
   }
@@ -44,7 +56,7 @@ public class EconomyAccount {
         return false;
 
       balance += value;
-      dirty = true;
+      markDirty();
       return true;
     }
   }
@@ -55,16 +67,27 @@ public class EconomyAccount {
         return false;
 
       balance = value;
-      dirty = true;
+      markDirty();
       return true;
     }
   }
 
   public boolean isDirty() {
-    return dirty;
+    synchronized (this) {
+      return dirty;
+    }
   }
 
   public void clearDirty() {
-    this.dirty = false;
+    synchronized (this) {
+      this.dirty = false;
+    }
+  }
+
+  private void markDirty() {
+    this.dirty = true;
+
+    if (this.afterBalanceUpdate != null)
+      this.afterBalanceUpdate.run();
   }
 }

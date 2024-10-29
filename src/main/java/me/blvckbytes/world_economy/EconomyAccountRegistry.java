@@ -3,62 +3,64 @@ package me.blvckbytes.world_economy;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class EconomyAccountRegistry {
 
-  private final OfflinePlayer holder;
-  private final Map<WorldGroup, EconomyAccount> accountByWorldGroup;
+  private final WorldGroup worldGroup;
+  private final Map<UUID, EconomyAccount> accountById;
+
   private final ConfigKeeper<MainSection> config;
   private final BalanceConstraint balanceConstraint;
 
   public EconomyAccountRegistry(
-    OfflinePlayer holder,
-    Map<WorldGroup, EconomyAccount> accountByWorldGroup,
+    WorldGroup worldGroup,
     ConfigKeeper<MainSection> config,
     BalanceConstraint balanceConstraint
   ) {
-    this.holder = holder;
-    this.accountByWorldGroup = accountByWorldGroup;
+    this.worldGroup = worldGroup;
+    this.accountById = new HashMap<>();
     this.config = config;
     this.balanceConstraint = balanceConstraint;
   }
 
-  public boolean isDirty() {
-    for (var account : accountByWorldGroup.values()) {
-      if (account.isDirty())
-        return true;
-    }
-
-    return false;
+  public Collection<EconomyAccount> getTopAccounts(int limit) {
+    // TODO: Implement
+    return Collections.unmodifiableCollection(accountById.values());
   }
 
-  public void clearDirty() {
-    for (var account : accountByWorldGroup.values()) {
-      account.clearDirty();
-    }
+  public Collection<EconomyAccount> getAccounts() {
+    return Collections.unmodifiableCollection(accountById.values());
   }
 
-  public OfflinePlayer getHolder() {
-    return holder;
+  public void registerAccount(OfflinePlayer holder, EconomyAccount account) {
+    this.accountById.put(holder.getUniqueId(), account);
+
+    account.afterBalanceUpdate = () -> {
+      updateTopListPosition(account);
+    };
+
+    updateTopListPosition(account);
   }
 
-  public EconomyAccount getAccount(WorldGroup worldGroup) {
-    return accountByWorldGroup.computeIfAbsent(worldGroup, key -> (
-      new EconomyAccount(config.rootSection.economy.startingBalance, balanceConstraint)
-    ));
+  public @Nullable EconomyAccount getAccount(OfflinePlayer holder) {
+    var holderId = holder.getUniqueId();
+    var account = accountById.get(holderId);
+
+    if (account != null)
+      return account;
+
+    if (!holder.hasPlayedBefore())
+      return null;
+
+    account = new EconomyAccount(holder, worldGroup, config.rootSection.economy.startingBalance, balanceConstraint);
+    registerAccount(holder, account);
+    return account;
   }
 
-  public Map<String, Double> toScalarMap() {
-    var result = new HashMap<String, Double>();
-
-    for (var entry : accountByWorldGroup.entrySet()) {
-      var worldGroupIdentifier = entry.getKey().identifierNameLower();
-      var accountBalance = entry.getValue().getBalance();
-      result.put(worldGroupIdentifier, accountBalance);
-    }
-
-    return result;
+  private void updateTopListPosition(EconomyAccount account) {
+    // TODO: Implement
   }
 }

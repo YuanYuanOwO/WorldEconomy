@@ -1,5 +1,6 @@
 package me.blvckbytes.world_economy.commands;
 
+import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.PluginPermission;
 import me.blvckbytes.world_economy.config.MainSection;
@@ -23,10 +24,11 @@ public class ReloadCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    BukkitEvaluable message;
+
     if (sender instanceof Player player && !PluginPermission.COMMAND_RELOAD.has(player)) {
-      player.sendMessage(config.rootSection.playerMessages.missingPermissionReloadCommand.stringify(
-        config.rootSection.builtBaseEnvironment
-      ));
+      if ((message = config.rootSection.playerMessages.missingPermissionReloadCommand) != null)
+        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
     }
@@ -34,15 +36,13 @@ public class ReloadCommand implements CommandExecutor {
     try {
       this.config.reload();
 
-      sender.sendMessage(config.rootSection.playerMessages.pluginReloadedSuccess.stringify(
-        config.rootSection.builtBaseEnvironment
-      ));
+      if ((message = config.rootSection.playerMessages.pluginReloadedSuccess) != null)
+        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
     } catch (Exception e) {
       logger.log(Level.SEVERE, "An error occurred while trying to reload the config", e);
 
-      sender.sendMessage(config.rootSection.playerMessages.pluginReloadedError.stringify(
-        config.rootSection.builtBaseEnvironment
-      ));
+      if ((message = config.rootSection.playerMessages.pluginReloadedError) != null)
+        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
     }
 
     return true;

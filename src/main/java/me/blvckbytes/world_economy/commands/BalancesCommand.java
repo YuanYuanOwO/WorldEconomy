@@ -3,9 +3,9 @@ package me.blvckbytes.world_economy.commands;
 import me.blvckbytes.bbconfigmapper.ScalarType;
 import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
-import me.blvckbytes.gpeee.GPEEE;
 import me.blvckbytes.world_economy.*;
 import me.blvckbytes.world_economy.config.MainSection;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,20 +16,20 @@ import java.util.*;
 
 public class BalancesCommand implements CommandExecutor, TabCompleter {
 
-  private final EconomyDataRegistry dataRegistry;
+  private final EconomyDataRegistry economyDataRegistry;
   private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflinePlayerCache offlinePlayerCache;
   private final ConfigKeeper<MainSection> config;
 
   public BalancesCommand(
-    EconomyDataRegistry dataRegistry,
+    EconomyDataRegistry economyDataRegistry,
     WorldEconomyProvider economyProvider,
     WorldGroupRegistry worldGroupRegistry,
     OfflinePlayerCache offlinePlayerCache,
     ConfigKeeper<MainSection> config
   ) {
-    this.dataRegistry = dataRegistry;
+    this.economyDataRegistry = economyDataRegistry;
     this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlinePlayerCache = offlinePlayerCache;
@@ -38,100 +38,101 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    BukkitEvaluable message;
+
     if (!PluginPermission.COMMAND_BALANCES.has(sender)) {
-      sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalancesSelfCommand.stringify(
-        config.rootSection.builtBaseEnvironment
-      ));
+      if ((message = config.rootSection.playerMessages.missingPermissionBalancesSelfCommand) != null)
+        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
     }
 
     var canViewOthers = PluginPermission.COMMAND_BALANCES_OTHER.has(sender);
 
-    EconomyAccountRegistry targetRegistry;
+    OfflinePlayer targetPlayer;
 
     if (args.length == 0) {
       if (!(sender instanceof Player player)) {
-        sender.sendMessage(config.rootSection.playerMessages.playerOnlyBalancesSelfCommand.stringify(
-          config.rootSection.builtBaseEnvironment
-        ));
+        if ((message = config.rootSection.playerMessages.playerOnlyBalancesSelfCommand) != null)
+          message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
       }
 
-      targetRegistry = dataRegistry.getAccountRegistry(player);
-
-      if (targetRegistry == null) {
-        sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountSelf.stringify(
-          config.rootSection.builtBaseEnvironment
-        ));
-
-        return true;
-      }
+      targetPlayer = player;
     }
 
     else if (args.length == 1) {
-      var targetPlayer = offlinePlayerCache.getByName(args[0]);
+      targetPlayer = offlinePlayerCache.getByName(args[0]);
 
       if (targetPlayer != sender && !canViewOthers) {
-        sender.sendMessage(config.rootSection.playerMessages.missingPermissionBalancesOtherCommand.stringify(
-          config.rootSection.builtBaseEnvironment
-        ));
-
-        return true;
-      }
-
-      targetRegistry = dataRegistry.getAccountRegistry(targetPlayer);
-
-      if (targetRegistry == null) {
-        sender.sendMessage(config.rootSection.playerMessages.couldNotLoadAccountOther.stringify(
-          config.rootSection.getBaseEnvironment()
-            .withStaticVariable("name", targetPlayer.getName())
-            .build()
-        ));
+        if ((message = config.rootSection.playerMessages.missingPermissionBalancesOtherCommand) != null)
+          message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
       }
     }
 
     else {
-      BukkitEvaluable message;
-
       if (canViewOthers)
         message = config.rootSection.playerMessages.usageBalancesCommandOther;
       else
         message = config.rootSection.playerMessages.usageBalancesCommandSelf;
 
-      sender.sendMessage(message.stringify(
-        config.rootSection.getBaseEnvironment()
-          .withStaticVariable("label", label)
-          .build()
-      ));
+      if (message != null) {
+        message.sendMessage(
+          sender,
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("label", label)
+            .build()
+        );
+      }
 
       return true;
     }
 
-    config.rootSection.playerMessages.balancesScreen.asList(
-      ScalarType.STRING,
-      config.rootSection.getBaseEnvironment()
-        .withStaticVariable("holder", targetRegistry.getHolder().getName())
-        .withStaticVariable("balances", makeBalancesLines(targetRegistry))
-        .build()
-    ).forEach(sender::sendMessage);
-
-    return true;
-  }
-
-  private Set<Map.Entry<String, String>> makeBalancesLines(EconomyAccountRegistry accountRegistry) {
-    var result = new LinkedHashMap<String, String>();
+    Map<String, String> formattedBalanceByWorldGroupDisplayName = new LinkedHashMap<>();
 
     for (var worldGroup : worldGroupRegistry.getWorldGroups()) {
-      var displayName = worldGroup.displayName().stringify(config.rootSection.builtBaseEnvironment);
-      var accountBalance = accountRegistry.getAccount(worldGroup).getBalance();
-      result.put(displayName, economyProvider.format(accountBalance));
+      var accountRegistry = economyDataRegistry.getAccountRegistry(worldGroup);
+      var targetAccount = accountRegistry.getAccount(targetPlayer);
+
+      if (targetAccount == null) {
+        message = (
+          targetPlayer == sender
+            ? config.rootSection.playerMessages.couldNotLoadAccountSelf
+            : config.rootSection.playerMessages.couldNotLoadAccountOther
+        );
+
+        if (message != null) {
+          message.sendMessage(
+            sender,
+            config.rootSection.getBaseEnvironment()
+              .withStaticVariable("name", targetPlayer.getName())
+              .build()
+          );
+        }
+
+        return true;
+      }
+
+      formattedBalanceByWorldGroupDisplayName.put(
+        targetAccount.worldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment),
+        economyProvider.format(targetAccount.getBalance())
+      );
     }
 
-    return result.entrySet();
+    if ((message = config.rootSection.playerMessages.balancesScreen) != null) {
+      message.sendMessage(
+        sender,
+        config.rootSection.getBaseEnvironment()
+          .withStaticVariable("holder", targetPlayer.getName())
+          .withStaticVariable("balances", formattedBalanceByWorldGroupDisplayName.entrySet())
+          .build()
+      );
+    }
+
+    return true;
   }
 
   @Override

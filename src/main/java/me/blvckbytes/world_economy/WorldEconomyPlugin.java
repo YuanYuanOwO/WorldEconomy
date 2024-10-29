@@ -42,12 +42,9 @@ public class WorldEconomyPlugin extends JavaPlugin {
       var offlineLocationReader = new OfflineLocationReader(worldGroupRegistry, config, logger);
       Bukkit.getServer().getPluginManager().registerEvents(offlineLocationReader, this);
 
-      economyDataRegistry = new EconomyDataRegistry(this, offlineLocationReader, worldGroupRegistry, config, logger);
-      Bukkit.getServer().getPluginManager().registerEvents(economyDataRegistry, this);
+      economyDataRegistry = new EconomyDataRegistry(this, offlineLocationReader, offlinePlayerCache, worldGroupRegistry, config, logger);
 
       registerProvider(new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache));
-
-      var topListRegistry = new TopListRegistry(economyDataRegistry, offlinePlayerCache, config, logger);
 
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(
@@ -57,7 +54,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
           economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache, config
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
-          offlineLocationReader, worldGroupRegistry, topListRegistry, economyProvider, config
+          offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
           offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider, config
@@ -82,7 +79,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
     }
 
     if (economyDataRegistry != null) {
-      economyDataRegistry.writeAndClearCache();
+      economyDataRegistry.writeDirtyAccounts();
       economyDataRegistry = null;
     }
   }

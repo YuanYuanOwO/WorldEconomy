@@ -22,18 +22,18 @@ public class WorldEconomyProvider implements Economy {
 
   private final Plugin plugin;
   private final ConfigKeeper<MainSection> config;
-  private final EconomyDataRegistry accountRegistry;
+  private final EconomyDataRegistry economyDataRegistry;
   private final OfflinePlayerCache offlinePlayerCache;
 
   public WorldEconomyProvider(
     Plugin plugin,
     ConfigKeeper<MainSection> config,
-    EconomyDataRegistry accountRegistry,
+    EconomyDataRegistry economyDataRegistry,
     OfflinePlayerCache offlinePlayerCache
   ) {
     this.plugin = plugin;
     this.config = config;
-    this.accountRegistry = accountRegistry;
+    this.economyDataRegistry = economyDataRegistry;
     this.offlinePlayerCache = offlinePlayerCache;
   }
 
@@ -100,7 +100,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean hasAccount(OfflinePlayer player) {
-    return accountRegistry.getForLastWorld(player) != null;
+    return economyDataRegistry.getForLastWorld(player) != null;
   }
 
   @Override
@@ -110,7 +110,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean hasAccount(OfflinePlayer player, String worldName) {
-    return accountRegistry.getForWorldName(player, worldName) != null;
+    return economyDataRegistry.getForWorldName(player, worldName) != null;
   }
 
   @Override
@@ -120,7 +120,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean createPlayerAccount(OfflinePlayer player) {
-    return accountRegistry.createForLastWorld(player);
+    return economyDataRegistry.createForLastWorld(player);
   }
 
   @Override
@@ -130,7 +130,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
-    return accountRegistry.createForWorldName(player, worldName);
+    return economyDataRegistry.createForWorldName(player, worldName);
   }
 
   // ================================================================================
@@ -144,7 +144,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public double getBalance(OfflinePlayer player) {
-    var account = accountRegistry.getForLastWorld(player);
+    var account = economyDataRegistry.getForLastWorld(player);
     return account == null ? 0 : account.getBalance();
   }
 
@@ -155,7 +155,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public double getBalance(OfflinePlayer player, String worldName) {
-    var account = accountRegistry.getForWorldName(player, worldName);
+    var account = economyDataRegistry.getForWorldName(player, worldName);
     return account == null ? 0 : account.getBalance();
   }
 
@@ -166,7 +166,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean has(OfflinePlayer player, double value) {
-    var account = accountRegistry.getForLastWorld(player);
+    var account = economyDataRegistry.getForLastWorld(player);
     return account != null && account.hasBalance(value);
   }
 
@@ -177,7 +177,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean has(OfflinePlayer player, String worldName, double value) {
-    var account = accountRegistry.getForWorldName(player, worldName);
+    var account = economyDataRegistry.getForWorldName(player, worldName);
     return account != null && account.hasBalance(value);
   }
 
@@ -192,7 +192,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse withdrawPlayer(OfflinePlayer player, double value) {
-    return handleWithdraw(accountRegistry.getForLastWorld(player), value);
+    return handleWithdraw(economyDataRegistry.getForLastWorld(player), value);
   }
 
   @Override
@@ -202,7 +202,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double value) {
-    return handleWithdraw(accountRegistry.getForWorldName(player, worldName), value);
+    return handleWithdraw(economyDataRegistry.getForWorldName(player, worldName), value);
   }
 
   private EconomyResponse handleWithdraw(@Nullable EconomyAccount account, double value) {
@@ -226,7 +226,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse depositPlayer(OfflinePlayer player, double value) {
-    return handleDeposit(accountRegistry.getForLastWorld(player), value);
+    return handleDeposit(economyDataRegistry.getForLastWorld(player), value);
   }
 
   @Override
@@ -236,7 +236,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double value) {
-    return handleDeposit(accountRegistry.getForWorldName(player, worldName), value);
+    return handleDeposit(economyDataRegistry.getForWorldName(player, worldName), value);
   }
 
   private EconomyResponse handleDeposit(@Nullable EconomyAccount account, double value) {
