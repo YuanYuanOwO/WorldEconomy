@@ -221,9 +221,6 @@ public class EconomyDataRegistry implements BalanceConstraint {
     if (!playerFile.isFile())
       return null;
 
-    // TODO: Remove this debug-line
-    logger.info("Loaded player-file for " + holder.getUniqueId() + " (" + holder.getName() + ")");
-
     try (
       var fileReader = new FileReader(playerFile)
     ) {
@@ -274,9 +271,6 @@ public class EconomyDataRegistry implements BalanceConstraint {
   }
 
   private void storePlayerFile(OfflinePlayer holder, Collection<EconomyAccount> accounts) {
-    // TODO: Remove this debug-line
-    logger.info("Written player-file for " + holder.getUniqueId() + " (" + holder.getName() + ")");
-
     var playerId = holder.getUniqueId();
     var playerFile = new File(playersFolder, playerId + ".json");
 

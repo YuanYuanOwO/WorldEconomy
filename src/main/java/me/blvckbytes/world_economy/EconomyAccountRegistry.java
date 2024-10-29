@@ -12,6 +12,9 @@ public class EconomyAccountRegistry {
   private final WorldGroup worldGroup;
   private final Map<UUID, EconomyAccount> accountById;
 
+  private final Map<UUID, Integer> topListIndexById;
+  private final List<EconomyAccount> topList;
+
   private final ConfigKeeper<MainSection> config;
   private final BalanceConstraint balanceConstraint;
 
@@ -21,14 +24,26 @@ public class EconomyAccountRegistry {
     BalanceConstraint balanceConstraint
   ) {
     this.worldGroup = worldGroup;
+
     this.accountById = new HashMap<>();
+    this.topListIndexById = new HashMap<>();
+    this.topList = new ArrayList<>();
+
     this.config = config;
     this.balanceConstraint = balanceConstraint;
   }
 
   public Collection<EconomyAccount> getTopAccounts(int limit) {
-    // TODO: Implement
-    return Collections.unmodifiableCollection(accountById.values());
+    var result = new ArrayList<EconomyAccount>();
+
+    for (var i = topList.size() - 1; i >= 0; --i) {
+      result.add(topList.get(i));
+
+      if (result.size() == limit)
+        break;
+    }
+
+    return result;
   }
 
   public Collection<EconomyAccount> getAccounts() {
@@ -61,6 +76,20 @@ public class EconomyAccountRegistry {
   }
 
   private void updateTopListPosition(EconomyAccount account) {
-    // TODO: Implement
+    synchronized (topList) {
+      var playerId = account.holder.getUniqueId();
+      var existingIndex = topListIndexById.remove(playerId);
+
+      if (existingIndex != null)
+        topList.remove((int) existingIndex);
+
+      var newIndex = Collections.binarySearch(topList, account, Comparator.comparing(EconomyAccount::getBalance));
+
+      if (newIndex < 0)
+        newIndex = -newIndex - 1;
+
+      topList.add(newIndex, account);
+      topListIndexById.put(playerId, newIndex);
+    }
   }
 }
