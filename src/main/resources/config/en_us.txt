@@ -93,6 +93,7 @@ MESSAGE-NOT-ENOUGH-MONEY-TO-PAY-OTHER-GROUP {prefix}&cYour balance of &e{balance
 # - name: String
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-THIS-GROUP  {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance.
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-OTHER-GROUP {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance in &e{world_group}&c.
+MESSAGE-MISSING-PERMISSION-PAY-COMMAND                {prefix}&cYou have no permission to use the pay command.
 
 # ==================== Reload Command ====================
 

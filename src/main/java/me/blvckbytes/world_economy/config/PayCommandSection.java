@@ -7,7 +7,11 @@ public class PayCommandSection extends ACommandSection {
 
   public static final String INITIAL_NAME = "pay";
 
+  public boolean resolveTargetLastWorldGroup;
+
   public PayCommandSection(EvaluationEnvironmentBuilder baseEnvironment) {
     super(INITIAL_NAME, baseEnvironment);
+
+    this.resolveTargetLastWorldGroup = false;
   }
 }

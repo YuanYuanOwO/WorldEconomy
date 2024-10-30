@@ -25,6 +25,9 @@ commands:
     name: money
   pay:
     name: pay
+    # Whether to resolve the target player's last world-group if they're offline
+    # true tries to resolve it, false just uses the same world-group as the sender is in
+    resolveTargetLastWorldGroup: false
   payGroup:
     name: paygroup
     aliases:
@@ -210,7 +213,7 @@ playerMessages:
   paymentSentToPlayerDifferentGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have sent &e" & amount & " &7to &e" & receiver_name & " &7in &e" & target_group & "&7; new balance of &e" & source_group & "&7: &e" & source_new_balance & "&7."'
   paymentReceivedFromPlayerSameGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & "&7; new balance&7: &e" & target_new_balance & "&7."'
   paymentReceivedFromPlayerDifferentGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & " &7in &e" & source_group & "&7; new balance of &e" & target_group & "&7: &e" & target_new_balance & "&7."'
-  missingPermissionPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the pay command."'
+  missingPermissionPayCommand$: '@{MESSAGE-MISSING-PERMISSION-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
 
   missingPermissionMoneyCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the money command."'
   # input: String

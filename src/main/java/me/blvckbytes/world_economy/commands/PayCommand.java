@@ -83,7 +83,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       // Specified target world-group
       if (args.length >= 3) {
         if (!isPayGroupCommand) {
-          sendUsageMessage(sender, label, false, canSpecifySource);
+          sendUsageMessage(sender, label, false, false);
           return true;
         }
 
@@ -110,11 +110,14 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
           return true;
         }
 
-        var targetLastLocation = offlineLocationReader.getLastLocation(targetPlayer);
+        var doResolveLast = config.rootSection.commands.pay.resolveTargetLastWorldGroup;
+        var lastLocationTarget = doResolveLast ? targetPlayer : player;
+
+        var targetLastLocation = offlineLocationReader.getLastLocation(lastLocationTarget);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          sendUnknownWorldGroupMessage(targetLastLocation, targetPlayer, sender);
+          sendUnknownWorldGroupMessage(targetLastLocation, lastLocationTarget, sender);
           return true;
         }
       }
