@@ -7,7 +7,11 @@ public class MoneyCommandSection extends ACommandSection {
 
   public static final String INITIAL_NAME = "money";
 
+  public boolean resolveTargetLastWorldGroup;
+
   public MoneyCommandSection(EvaluationEnvironmentBuilder baseEnvironment) {
     super(INITIAL_NAME, baseEnvironment);
+
+    this.resolveTargetLastWorldGroup = false;
   }
 }

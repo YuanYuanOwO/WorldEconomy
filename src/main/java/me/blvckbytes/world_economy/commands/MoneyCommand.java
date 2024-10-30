@@ -82,11 +82,14 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
           return false;
         }
 
-        var targetLastLocation = offlineLocationReader.getLastLocation(player);
+        var doResolveLast = config.rootSection.commands.money.resolveTargetLastWorldGroup;
+        var lastLocationTarget = doResolveLast ? targetPlayer : player;
+
+        var targetLastLocation = offlineLocationReader.getLastLocation(lastLocationTarget);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          sendUnknownWorldGroupMessage(targetLastLocation, player, sender);
+          sendUnknownWorldGroupMessage(targetLastLocation, lastLocationTarget, sender);
           return true;
         }
       }
