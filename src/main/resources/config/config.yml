@@ -101,6 +101,13 @@ playerMessages:
   notInAnyWorldGroupOther$: '@{MESSAGE-NOT-IN-ANY-WORLD-GROUP-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   # name: String
   unknownWorldGroup$: '@{MESSAGE-UNKNOWN-WORLD-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  # value: String
+  valueIsNotADouble$: '@{MESSAGE-VALUE-IS-NOT-A-DOUBLE(prefix=lut["MESSAGE_PREFIX"])}'
+  # value: String
+  valueIsNotStrictlyPositive$: '@{MESSAGE-VALUE-IS-NOT-STRICTLY-POSITIVE(prefix=lut["MESSAGE_PREFIX"])}'
+  # value: String
+  # step_size: String
+  valueIsNotAMultipleOfTransactionStepSize$: '@{MESSAGE-VALUE-IS-NOT-A-MULTIPLE-OF-TRANSACTION-STEP-SIZE(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionBalancesCommandSelf$: '@{MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionBalancesCommandOther$: '@{MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyBalancesCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCES-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
@@ -154,34 +161,42 @@ playerMessages:
   missingPermissionBalanceCommandOther$: '@{MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyBalanceCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyBalanceGroupCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
-
-  playerOnlyPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can pay to others."'
-  cannotPaySelf$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay yourself."'
-  cannotPayCrossWorldGroups$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay to another world-group than you''re currently in."'
+  playerOnlyPayCommand$: '@{MESSAGE-PLAYER-ONLY-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
+  cannotPaySelf$: '@{MESSAGE-CANNOT-PAY-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  # - source_world_group: String
+  # - target_world_group: String
+  cannotPayCrossWorldGroups$: '@{MESSAGE-CANNOT-PAY-CROSS-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
-  usagePayCommand$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount>"'
+  usagePayCommand$: '@{MESSAGE-USAGE-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
   # group_names: List<String>
   usagePayGroupCommand$: |
-    names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
-    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> <target-group: " & names_string & "&c> [source-group: " & names_string & "&c]"
-  missingPermissionCommandPayGroupSource$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom source world-group."'
-  # value: String
-  valueIsNotADouble$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a valid floating-point number."'
-  # value: String
-  valueIsNotStrictlyPositive$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not strictly positive."'
-  # value: String
-  # step_size: String
-  valueIsNotAMultipleOfTransactionStepSize$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a multiple of &4" & step_size & "&c."'
+    world_group_list = iter_cat(group_names, (group_name) => @{MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM}, @{MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR}, @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])})
+    @{MESSAGE-USAGE-PAYGROUP-COMMAND(prefix=lut["MESSAGE_PREFIX"])}
+  # label: String
+  # group_names: List<String>
+  usagePayGroupCommandSource$: |
+    world_group_list = iter_cat(group_names, (group_name) => @{MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM}, @{MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR}, @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])})
+    @{MESSAGE-USAGE-PAYGROUP-COMMAND-SOURCE(prefix=lut["MESSAGE_PREFIX"])}
+  missingPermissionCommandPayGroupSource$: '@{MESSAGE-MISSING-PERMISSION-PAYGROUP-COMMAND-SOURCE(prefix=lut["MESSAGE_PREFIX"])}'
   # balance: String
   # amount: String
-  # group: String
-  notEnoughMoneyToPay$: 'lut["MESSAGE_PREFIX"] & "&cYour balance of &e" & balance & " &cin &e" & group & " &cdoes not suffice to pay &e" & amount & "&c."'
+  # world_group: String
+  notEnoughMoneyToPayThisGroup$: '@{MESSAGE-NOT-ENOUGH-MONEY-TO-PAY-THIS-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
   # balance: String
   # amount: String
-  # group: String
+  # world_group: String
+  notEnoughMoneyToPayOtherGroup$: '@{MESSAGE-NOT-ENOUGH-MONEY-TO-PAY-OTHER-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  # balance: String
+  # amount: String
+  # world_group: String
   # name: String
-  paymentExceedsReceiversBalance$: 'lut["MESSAGE_PREFIX"] & "&cA payment of &e" & amount & " &cwould exceed &e" & name & "''s &cbalance."'
+  paymentExceedsReceiversBalanceThisGroup$: '@{MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-THIS-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  # balance: String
+  # amount: String
+  # world_group: String
+  # name: String
+  paymentExceedsReceiversBalanceOtherGroup$: '@{MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-OTHER-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
   # target_old_balance: String
   # target_new_balance: String
   # source_old_balance: String

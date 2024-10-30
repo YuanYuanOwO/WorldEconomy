@@ -60,6 +60,8 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       return true;
     }
 
+    var canSpecifySource = PluginPermission.COMMAND_PAYGROUP_SOURCE.has(sender);
+
     OfflinePlayer targetPlayer;
     Double amount;
     WorldGroup targetWorldGroup;
@@ -81,7 +83,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       // Specified target world-group
       if (args.length >= 3) {
         if (!isPayGroupCommand) {
-          sendUsageMessage(sender, label, false);
+          sendUsageMessage(sender, label, false, canSpecifySource);
           return true;
         }
 
@@ -104,7 +106,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       else {
         // Target-group is mandatory
         if (isPayGroupCommand) {
-          sendUsageMessage(sender, label, true);
+          sendUsageMessage(sender, label, true, canSpecifySource);
           return true;
         }
 
@@ -119,7 +121,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
 
       // Specified source world-group
       if (args.length == 4) {
-        if (!PluginPermission.COMMAND_PAYGROUP_SOURCE.has(player)) {
+        if (!canSpecifySource) {
           if ((message = config.rootSection.playerMessages.missingPermissionCommandPayGroupSource) != null)
             message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
@@ -154,7 +156,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     }
 
     else {
-      sendUsageMessage(sender, label, isPayGroupCommand);
+      sendUsageMessage(sender, label, isPayGroupCommand, canSpecifySource);
       return true;
     }
 
@@ -173,8 +175,15 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     );
 
     if (!sourceWorldGroup.equals(targetWorldGroup) && !crossPermission.has(player)) {
-      if ((message = config.rootSection.playerMessages.cannotPayCrossWorldGroups) != null)
-        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
+      if ((message = config.rootSection.playerMessages.cannotPayCrossWorldGroups) != null) {
+        message.sendMessage(
+          sender,
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("source_world_group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+            .withStaticVariable("target_world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+            .build()
+        );
+      }
 
       return true;
     }
@@ -193,7 +202,12 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     // ========== Transaction Begin ==========
 
     if (!sourceAccount.withdraw(amount)) {
-      if ((message = config.rootSection.playerMessages.notEnoughMoneyToPay) != null) {
+      if (sourceWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName()))
+        message = config.rootSection.playerMessages.notEnoughMoneyToPayThisGroup;
+      else
+        message = config.rootSection.playerMessages.notEnoughMoneyToPayOtherGroup;
+
+      if (message != null) {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()
@@ -210,7 +224,12 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     if (!targetAccount.deposit(amount)) {
       sourceAccount.deposit(amount); // Rollback previous withdrawal
 
-      if ((message = config.rootSection.playerMessages.paymentExceedsReceiversBalance) != null) {
+      if (targetWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName()))
+        message = config.rootSection.playerMessages.paymentExceedsReceiversBalanceThisGroup;
+      else
+        message = config.rootSection.playerMessages.paymentExceedsReceiversBalanceOtherGroup;
+
+      if (message != null) {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()
@@ -291,12 +310,15 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     return List.of();
   }
 
-  private void sendUsageMessage(CommandSender sender, String label, boolean supportsGroups) {
+  private void sendUsageMessage(CommandSender sender, String label, boolean supportsGroups, boolean canSpecifySource) {
     BukkitEvaluable message;
 
-    if (supportsGroups)
-      message = config.rootSection.playerMessages.usagePayGroupCommand;
-    else
+    if (supportsGroups) {
+      if (canSpecifySource)
+        message = config.rootSection.playerMessages.usagePayGroupCommandSource;
+      else
+        message = config.rootSection.playerMessages.usagePayGroupCommand;
+    } else
       message = config.rootSection.playerMessages.usagePayCommand;
 
     if (message != null) {

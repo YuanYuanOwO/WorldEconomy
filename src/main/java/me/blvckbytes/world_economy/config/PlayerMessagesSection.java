@@ -33,6 +33,7 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable cannotPayCrossWorldGroups;
   public @Nullable BukkitEvaluable usagePayCommand;
   public @Nullable BukkitEvaluable usagePayGroupCommand;
+  public @Nullable BukkitEvaluable usagePayGroupCommandSource;
   public @Nullable BukkitEvaluable missingPermissionCommandPayGroupSource;
 
   public @Nullable BukkitEvaluable unknownWorldGroup;
@@ -43,8 +44,10 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable valueIsNotADouble;
   public @Nullable BukkitEvaluable valueIsNotStrictlyPositive;
   public @Nullable BukkitEvaluable valueIsNotAMultipleOfTransactionStepSize;
-  public @Nullable BukkitEvaluable notEnoughMoneyToPay;
-  public @Nullable BukkitEvaluable paymentExceedsReceiversBalance;
+  public @Nullable BukkitEvaluable notEnoughMoneyToPayThisGroup;
+  public @Nullable BukkitEvaluable notEnoughMoneyToPayOtherGroup;
+  public @Nullable BukkitEvaluable paymentExceedsReceiversBalanceThisGroup;
+  public @Nullable BukkitEvaluable paymentExceedsReceiversBalanceOtherGroup;
   public @Nullable BukkitEvaluable paymentSentToPlayerSameGroup;
   public @Nullable BukkitEvaluable paymentSentToPlayerDifferentGroup;
   public @Nullable BukkitEvaluable paymentReceivedFromPlayerSameGroup;

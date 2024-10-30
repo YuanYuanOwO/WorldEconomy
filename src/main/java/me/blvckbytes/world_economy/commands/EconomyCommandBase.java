@@ -32,7 +32,10 @@ public abstract class EconomyCommandBase {
     }
 
     if (amount <= 0) {
-      sendValueMessage(sender, config.rootSection.playerMessages.valueIsNotStrictlyPositive, value);
+      sendValueMessage(
+        sender, config.rootSection.playerMessages.valueIsNotStrictlyPositive,
+        economyProvider.format(amount)
+      );
       return null;
     }
 
@@ -45,7 +48,7 @@ public abstract class EconomyCommandBase {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()
-            .withStaticVariable("value", value)
+            .withStaticVariable("value", economyProvider.format(amount))
             .withStaticVariable("step_size", economyProvider.format(transactionStepSize))
             .build()
         );
