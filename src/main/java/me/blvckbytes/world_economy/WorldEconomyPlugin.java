@@ -7,6 +7,7 @@ import me.blvckbytes.bukkitevaluable.section.ACommandSection;
 import me.blvckbytes.gpeee.Tuple;
 import me.blvckbytes.world_economy.commands.*;
 import me.blvckbytes.world_economy.config.MainSection;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.ServicePriority;
@@ -19,7 +20,7 @@ import java.util.logging.Level;
 
 public class WorldEconomyPlugin extends JavaPlugin {
 
-  private @Nullable WorldEconomyProvider economyProvider;
+  private @Nullable Economy economyProvider;
   private @Nullable EconomyDataRegistry economyDataRegistry;
 
   @Override
@@ -43,7 +44,12 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
       economyDataRegistry = new EconomyDataRegistry(this, offlineLocationReader, offlinePlayerCache, worldGroupRegistry, config, logger);
 
-      registerProvider(new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache));
+      Economy provider = new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache);
+
+      if (config.rootSection.economy.logProviderCalls)
+        provider = new LoggingEconomyWrapper(provider, logger);
+
+      registerProvider(provider);
 
       var payCommand = new PayCommand(offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config);
       var balanceCommand = new BalanceCommand(economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache, config);
@@ -116,7 +122,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
   }
 
   @SuppressWarnings("unchecked")
-  private void registerProvider(WorldEconomyProvider provider) throws ClassNotFoundException {
+  private void registerProvider(Economy provider) throws ClassNotFoundException {
     this.economyProvider = provider;
 
     Bukkit.getServer().getServicesManager().register(

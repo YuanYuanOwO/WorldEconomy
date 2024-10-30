@@ -5,6 +5,7 @@ import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.*;
 import me.blvckbytes.world_economy.config.MainSection;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,7 +23,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
 
   public BalancesCommand(
     EconomyDataRegistry economyDataRegistry,
-    WorldEconomyProvider economyProvider,
+    Economy economyProvider,
     WorldGroupRegistry worldGroupRegistry,
     OfflinePlayerCache offlinePlayerCache,
     ConfigKeeper<MainSection> config

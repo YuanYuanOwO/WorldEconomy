@@ -5,6 +5,7 @@ import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.*;
 import me.blvckbytes.world_economy.config.MainSection;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,7 +27,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
     EconomyDataRegistry economyDataRegistry,
     OfflineLocationReader offlineLocationReader,
     WorldGroupRegistry worldGroupRegistry,
-    WorldEconomyProvider economyProvider,
+    Economy economyProvider,
     ConfigKeeper<MainSection> config
   ) {
     super(config, economyProvider);

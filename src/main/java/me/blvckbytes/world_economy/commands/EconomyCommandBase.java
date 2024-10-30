@@ -4,9 +4,9 @@ import me.blvckbytes.bbconfigmapper.ScalarType;
 import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.OfflineLocationReader;
-import me.blvckbytes.world_economy.WorldEconomyProvider;
 import me.blvckbytes.world_economy.WorldGroup;
 import me.blvckbytes.world_economy.config.MainSection;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
@@ -14,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 public abstract class EconomyCommandBase {
 
   protected ConfigKeeper<MainSection> config;
-  protected WorldEconomyProvider economyProvider;
+  protected Economy economyProvider;
 
-  protected EconomyCommandBase(ConfigKeeper<MainSection> config, WorldEconomyProvider economyProvider) {
+  protected EconomyCommandBase(ConfigKeeper<MainSection> config, Economy economyProvider) {
     this.config = config;
     this.economyProvider = economyProvider;
   }

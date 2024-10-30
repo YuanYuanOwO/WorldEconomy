@@ -54,6 +54,9 @@ worldGroups:
       - world_the_end
 
 economy:
+  # Whether to log all calls made to the economy-provider for debugging-purposes
+  # This property does not support live-reloading, as many plugins do not handle provider re-registers correctly
+  logProviderCalls: false
   # Duration in-between writing accounts from memory to their corresponding files
   # Too little gaps will cause needless lag, too large may result in data-loss on unexpected shutdowns
   cacheWritePeriodSeconds: 30

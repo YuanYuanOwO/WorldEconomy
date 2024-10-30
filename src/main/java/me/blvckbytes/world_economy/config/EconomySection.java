@@ -20,6 +20,7 @@ public class EconomySection extends AConfigSection {
   public boolean doClampOnLoad;
   public long cacheWritePeriodSeconds;
   public int topListSize;
+  public boolean logProviderCalls;
 
   @CSAlways
   public NumberFormatSection currencyFormat;

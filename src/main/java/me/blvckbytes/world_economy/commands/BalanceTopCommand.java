@@ -5,6 +5,7 @@ import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.*;
 import me.blvckbytes.world_economy.config.MainSection;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
     OfflineLocationReader offlineLocationReader,
     EconomyDataRegistry economyDataRegistry,
     WorldGroupRegistry worldGroupRegistry,
-    WorldEconomyProvider economyProvider,
+    Economy economyProvider,
     ConfigKeeper<MainSection> config
   ) {
     super(config, economyProvider);

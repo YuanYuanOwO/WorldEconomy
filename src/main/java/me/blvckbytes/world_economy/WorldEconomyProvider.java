@@ -94,8 +94,8 @@ public class WorldEconomyProvider implements Economy {
   // ================================================================================
 
   @Override
-  public boolean hasAccount(String name) {
-    return hasAccount(offlinePlayerCache.getByName(name));
+  public boolean hasAccount(String playerName) {
+    return hasAccount(offlinePlayerCache.getByName(playerName));
   }
 
   @Override
@@ -259,57 +259,57 @@ public class WorldEconomyProvider implements Economy {
   }
 
   @Override
-  public EconomyResponse createBank(String s, String s1) {
+  public EconomyResponse createBank(String bankName, String playerName) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse createBank(String s, OfflinePlayer offlinePlayer) {
+  public EconomyResponse createBank(String bankName, OfflinePlayer player) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse deleteBank(String s) {
+  public EconomyResponse deleteBank(String bankName) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse bankBalance(String s) {
+  public EconomyResponse bankBalance(String bankName) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse bankHas(String s, double v) {
+  public EconomyResponse bankHas(String bankName, double value) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse bankWithdraw(String s, double v) {
+  public EconomyResponse bankWithdraw(String bankName, double value) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse bankDeposit(String s, double v) {
+  public EconomyResponse bankDeposit(String bankName, double value) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse isBankOwner(String s, String s1) {
+  public EconomyResponse isBankOwner(String bankName, String playerName) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse isBankOwner(String s, OfflinePlayer offlinePlayer) {
+  public EconomyResponse isBankOwner(String bankName, OfflinePlayer player) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse isBankMember(String s, String s1) {
+  public EconomyResponse isBankMember(String bankName, String playerName) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
   @Override
-  public EconomyResponse isBankMember(String s, OfflinePlayer offlinePlayer) {
+  public EconomyResponse isBankMember(String bankName, OfflinePlayer player) {
     return UNSUPPORTED_BANKS_RESPONSE;
   }
 
