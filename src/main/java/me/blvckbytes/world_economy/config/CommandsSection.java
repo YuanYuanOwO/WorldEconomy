@@ -8,9 +8,11 @@ import me.blvckbytes.gpeee.interpreter.EvaluationEnvironmentBuilder;
 public class CommandsSection extends AConfigSection {
 
   public BalanceCommandSection balance;
+  public BalanceGroupCommandSection balanceGroup;
   public BalancesCommandSection balances;
   public MoneyCommandSection money;
   public PayCommandSection pay;
+  public PayGroupCommandSection payGroup;
   public BalanceTopCommandSection balanceTop;
   public ReloadCommandSection reload;
 

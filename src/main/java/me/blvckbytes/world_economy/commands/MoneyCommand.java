@@ -108,7 +108,8 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
           return false;
         }
 
-        targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
+        // TODO: Migrate to latest API-changes
+        targetWorldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
 
         if (targetWorldGroup == null) {
           if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {

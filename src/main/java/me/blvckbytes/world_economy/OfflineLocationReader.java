@@ -16,11 +16,18 @@ import java.util.logging.Logger;
 
 public class OfflineLocationReader implements Listener {
 
+  private static final LastLocation NULL_LOCATION = new LastLocation(null, null);
+
+  public record LastLocation(
+    @Nullable String worldName,
+    @Nullable WorldGroup worldGroup
+  ) {}
+
   private final WorldGroupRegistry worldGroupRegistry;
   private final Logger logger;
   private final File mainWorldPlayerDataFolder;
 
-  private final Map<UUID, WorldGroup> worldGroupByUuidCache;
+  private final Map<UUID, LastLocation> lastLocationByUuidCache;
 
   public OfflineLocationReader(
     WorldGroupRegistry worldGroupRegistry,
@@ -41,35 +48,34 @@ public class OfflineLocationReader implements Listener {
     this.mainWorldPlayerDataFolder = new File(mainWorldFolder, "playerdata");
     this.worldGroupRegistry = worldGroupRegistry;
     this.logger = logger;
-    this.worldGroupByUuidCache = new HashMap<>();
+    this.lastLocationByUuidCache = new HashMap<>();
 
-    config.registerReloadListener(worldGroupByUuidCache::clear);
+    config.registerReloadListener(lastLocationByUuidCache::clear);
   }
 
-  public @Nullable WorldGroup getLastLocationWorldGroup(OfflinePlayer player) {
+  public LastLocation getLastLocation(OfflinePlayer player) {
     var playerId = player.getUniqueId();
 
     if (player instanceof Player onlinePlayer) {
-      worldGroupByUuidCache.remove(playerId);
-      return worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(onlinePlayer.getWorld().getName());
+      lastLocationByUuidCache.remove(playerId);
+      var worldName = onlinePlayer.getWorld().getName();
+      return new LastLocation(worldName, worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName));
     }
 
-    WorldGroup result;
+    LastLocation result;
 
-    if ((result = worldGroupByUuidCache.get(playerId)) != null)
+    if ((result = lastLocationByUuidCache.get(playerId)) != null)
       return result;
 
     var worldName = getWorldNameLowerFromPlayerDataFile(playerId);
 
     if (worldName == null)
-      return null;
+      return NULL_LOCATION;
 
-    result = worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName);
+    var worldGroup = worldGroupRegistry.getWorldGroupByMemberNameIgnoreCase(worldName);
 
-    if (result == null)
-      return null;
-
-    worldGroupByUuidCache.put(playerId, result);
+    result = new LastLocation(worldName, worldGroup);
+    lastLocationByUuidCache.put(playerId, result);
     return result;
   }
 

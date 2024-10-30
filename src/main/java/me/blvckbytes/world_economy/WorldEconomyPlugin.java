@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class WorldEconomyPlugin extends JavaPlugin {
@@ -46,10 +45,12 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
       registerProvider(new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache));
 
+      var payCommand = new PayCommand(offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config);
+      var balanceCommand = new BalanceCommand(economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache, config);
+
       setupCommands(config, List.of(
-        new Tuple<>(config.rootSection.commands.balance, new BalanceCommand(
-          economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache, config
-        )),
+        new Tuple<>(config.rootSection.commands.balance, balanceCommand),
+        new Tuple<>(config.rootSection.commands.balanceGroup, balanceCommand),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(
           economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache, config
         )),
@@ -59,9 +60,8 @@ public class WorldEconomyPlugin extends JavaPlugin {
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
           offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider, config
         )),
-        new Tuple<>(config.rootSection.commands.pay, new PayCommand(
-          offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config
-        )),
+        new Tuple<>(config.rootSection.commands.pay, payCommand),
+        new Tuple<>(config.rootSection.commands.payGroup, payCommand),
         new Tuple<>(config.rootSection.commands.reload, new ReloadCommand(config, logger))
       ));
     } catch (Exception e) {
@@ -93,7 +93,11 @@ public class WorldEconomyPlugin extends JavaPlugin {
 
     for (var commandTuple : commandTuples) {
       var commandSection = commandTuple.a;
-      var command = Objects.requireNonNull(getCommand(commandSection.initialName));
+      var command = getCommand(commandSection.initialName);
+
+      if (command == null)
+        throw new IllegalStateException("Could not locate command \"" + commandSection.initialName + "\"");
+
       var executor = commandTuple.b;
 
       command.setExecutor(executor);

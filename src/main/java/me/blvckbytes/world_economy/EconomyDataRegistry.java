@@ -164,7 +164,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
 
   public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
     synchronized (this) {
-      var worldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
+      var worldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
 
       if (worldGroup == null)
         return null;

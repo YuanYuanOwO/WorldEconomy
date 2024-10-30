@@ -5,7 +5,7 @@ import me.blvckbytes.gpeee.interpreter.EvaluationEnvironmentBuilder;
 
 public class BalanceTopCommandSection extends ACommandSection {
 
-  public static final String INITIAL_NAME = "baltop";
+  public static final String INITIAL_NAME = "balancetop";
 
   public BalanceTopCommandSection(EvaluationEnvironmentBuilder baseEnvironment) {
     super(INITIAL_NAME, baseEnvironment);

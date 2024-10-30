@@ -3,11 +3,11 @@ package me.blvckbytes.world_economy.config;
 import me.blvckbytes.bukkitevaluable.section.ACommandSection;
 import me.blvckbytes.gpeee.interpreter.EvaluationEnvironmentBuilder;
 
-public class ReloadCommandSection extends ACommandSection {
+public class PayGroupCommandSection extends ACommandSection {
 
-  public static final String INITIAL_NAME = "worldeconomyreload";
+  public static final String INITIAL_NAME = "paygroup";
 
-  public ReloadCommandSection(EvaluationEnvironmentBuilder baseEnvironment) {
+  public PayGroupCommandSection(EvaluationEnvironmentBuilder baseEnvironment) {
     super(INITIAL_NAME, baseEnvironment);
   }
 }

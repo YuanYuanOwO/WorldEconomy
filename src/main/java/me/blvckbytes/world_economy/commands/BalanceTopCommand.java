@@ -40,14 +40,14 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     BukkitEvaluable message;
 
-    if (!PluginPermission.COMMAND_BALTOP.has(sender)) {
+    if (!PluginPermission.COMMAND_BALANCETOP.has(sender)) {
       if ((message = config.rootSection.playerMessages.missingPermissionCommandBalTop) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
     }
 
-    var canSpecifyGroup = PluginPermission.COMMAND_BALTOP_GROUP.has(sender);
+    var canSpecifyGroup = PluginPermission.COMMAND_BALANCETOP_GROUP.has(sender);
     WorldGroup targetWorldGroup;
 
     if (args.length == 0) {
@@ -58,7 +58,8 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
         return true;
       }
 
-      targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
+      // TODO: Migrate to latest API-changes
+      targetWorldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
 
       if (targetWorldGroup == null) {
         if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
@@ -136,7 +137,7 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
   @Override
   public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 1) {
-      if (sender instanceof Player player && !PluginPermission.COMMAND_BALTOP_GROUP.has(player))
+      if (sender instanceof Player player && !PluginPermission.COMMAND_BALANCETOP_GROUP.has(player))
         return List.of();
 
       return worldGroupRegistry.createSuggestions(args[0]);

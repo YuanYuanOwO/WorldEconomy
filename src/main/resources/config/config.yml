@@ -13,29 +13,41 @@
 
 commands:
   balance:
-    name: bal
+    name: balance
     aliases:
-      - balance
+      - bal
+  balanceGroup:
+    name: balancegroup
+    aliases:
+      - balgroup
+      - balg
   money:
     name: money
   pay:
     name: pay
+  payGroup:
+    name: paygroup
+    aliases:
+      - payg
   balanceTop:
-    name: baltop
+    name: balancetop
     aliases:
-      - balancetop
+      - baltop
   reload:
-    name: wereload
+    name: worldeconomyreload
     aliases:
-      - worldeconomyreload
+      - wereload
   balances:
-    name: bals
+    name: balances
     aliases:
-      - balances
+      - bals
 
 worldGroups:
-  world:
+  # Used to internally identify balances - do not alter once initially established!
+  World:
+    # Rendered in chat, whenever this world-group is referred to
     displayName: '&6World'
+    # List of world-names which are coalesced into a single economy-account
     members:
       - world
       - world_nether
@@ -57,6 +69,7 @@ economy:
   minMoney: -1000.0
   # Whether to clamp existing accounts to the [min;max]-interval as specified above when loading them
   doClampOnLoad: true
+  # TODO: Actually consider this when executing /pay or /payg or /money
   # Set to null for no lower bound
   minPayAmount: .001
 
@@ -99,14 +112,20 @@ playerMessages:
   # current_world: String
   notInAnyWorldGroupSelf$: 'lut["MESSAGE_PREFIX"] & "&cYou''re currently not within any known world-group (world \"" & current_world & "\")."'
   # name: String
-  notInAnyWorldGroupOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &cis currently not within any known world-group."'
+  # current_world: String
+  notInAnyWorldGroupOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &cis currently not within any known world-group (world \"" & current_world & "\")."'
   # name: String
   unknownWorldGroup$: 'lut["MESSAGE_PREFIX"] & "&cCould not locate a world-group by the name of &4" & name & "&c."'
   # label: String
   usageBalanceCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
   # label: String
+  usageBalanceCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [player]"'
+  # label: String
   # group_names: String
-  usageBalanceCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c] [player]"'
+  usageBalanceGroupCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c>"'
+  # label: String
+  # group_names: String
+  usageBalanceGroupCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c> [player]"'
   # holder: String
   # balance: String
   # group: String
@@ -118,22 +137,19 @@ playerMessages:
   missingPermissionBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to use the balance command."'
   missingPermissionBalanceOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balance of others."'
   playerOnlyBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
+  playerOnlyBalanceGroupSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
 
   playerOnlyPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can pay to others."'
   cannotPaySelf$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay yourself."'
   cannotPayCrossWorldGroups$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay to another world-group than you''re currently in."'
   # label: String
-  # group_names: String
-  usagePayCommand$: |
-    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount>"
-  usagePayTargetCommand$: |
+  usagePayCommand$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount>"'
+  # label: String
+  # group_names: List<String>
+  usagePayGroupCommand$: |
     names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
-    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> [target group: " & names_string & "&c]"
-  usagePaySourceCommand$: |
-    names_string = iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ", "&cNo groups found")
-    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> [target group: " & names_string & "&c] [source group: " & names_string & "&c]"
-  missingPermissionCommandPayTarget$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom target world-group."'
-  missingPermissionCommandPaySource$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom source world-group."'
+    lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> <target-group: " & names_string & "&c> [source-group: " & names_string & "&c]"
+  missingPermissionCommandPayGroupSource$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom source world-group."'
   # value: String
   argumentIsNotADouble$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a valid floating-point number."'
   argumentIsNotStrictlyPositive$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not strictly positive."'
@@ -155,17 +171,10 @@ playerMessages:
   # source_group: String
   # sender_name: String
   # receiver_name: String
-  paymentSentToPlayer$: 'lut["MESSAGE_PREFIX"] & "&7You have sent &e" & amount & " &7to &e" & receiver_name & "&7; new balance of &e" & source_group & "&7: &e" & source_new_balance & "&7."'
-  # target_old_balance: String
-  # target_new_balance: String
-  # source_old_balance: String
-  # source_new_balance: String
-  # amount: String
-  # target_group: String
-  # source_group: String
-  # sender_name: String
-  # receiver_name: String
-  paymentReceivedFromPlayer$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & "&7; new balance of &e" & target_group & "&7: &e" & target_new_balance & "&7."'
+  paymentSentToPlayerSameGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have sent &e" & amount & " &7to &e" & receiver_name & "&7; new balance&7: &e" & source_new_balance & "&7."'
+  paymentSentToPlayerDifferentGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have sent &e" & amount & " &7to &e" & receiver_name & " &7in &e" & target_group & "&7; new balance of &e" & source_group & "&7: &e" & source_new_balance & "&7."'
+  paymentReceivedFromPlayerSameGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & "&7; new balance&7: &e" & target_new_balance & "&7."'
+  paymentReceivedFromPlayerDifferentGroup$: 'lut["MESSAGE_PREFIX"] & "&7You have received &e" & amount & " &7from &e" & sender_name & " &7in &e" & source_group & "&7; new balance of &e" & target_group & "&7: &e" & target_new_balance & "&7."'
   missingPermissionPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the pay command."'
 
   missingPermissionMoneyCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou have no permission to use the money command."'

@@ -6,15 +6,19 @@ author: BlvckBytes
 api-version: 1.13
 depend: [Vault, NBTAPI]
 commands:
-  bal:
+  balance:
     description: 'Retrieve the current balances of yourself and others'
-  bals:
+  balancegroup:
+    description: 'Retrieve the current balances of yourself and others within a specific world-group'
+  balances:
     description: 'Retrieve the current balances of all worlds of yourself and others'
-  baltop:
+  balancetop:
     description: 'Display the first N players for any given world, owning the highest balances'
   money:
     description: 'An administrative tool to update the balances of any given player'
   pay:
     description: 'Pay a positive amount of money to another player'
-  wereload:
+  payGroup:
+    description: 'Pay a positive amount of money to another player from/to specific world-groups'
+  worldeconomyreload:
     description: 'Reload the configuration-file'

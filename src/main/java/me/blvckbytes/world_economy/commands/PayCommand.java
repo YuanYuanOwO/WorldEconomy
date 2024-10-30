@@ -14,14 +14,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class PayCommand implements CommandExecutor, TabCompleter {
+public class PayCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
   private final OfflinePlayerCache offlinePlayerCache;
   private final OfflineLocationReader offlineLocationReader;
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
   private final WorldEconomyProvider economyProvider;
-  private final ConfigKeeper<MainSection> config;
 
   public PayCommand(
     OfflinePlayerCache offlinePlayerCache,
@@ -31,6 +30,8 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     WorldEconomyProvider economyProvider,
     ConfigKeeper<MainSection> config
   ) {
+    super(config);
+
     this.offlinePlayerCache = offlinePlayerCache;
     this.offlineLocationReader = offlineLocationReader;
     this.economyDataRegistry = economyDataRegistry;
@@ -41,6 +42,8 @@ public class PayCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    var isPayGroupCommand = config.rootSection.commands.payGroup.isLabel(label);
+
     BukkitEvaluable message;
 
     if (!(sender instanceof Player player)) {
@@ -50,7 +53,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       return true;
     }
 
-    if (!PluginPermission.COMMAND_PAY.has(player)) {
+    if (missingCommandPermission(player, isPayGroupCommand)) {
       if ((message = config.rootSection.playerMessages.missingPermissionPayCommand) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
@@ -75,36 +78,19 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       try {
         amount = Double.parseDouble(args[1]);
       } catch (NumberFormatException e) {
-        if ((message = config.rootSection.playerMessages.argumentIsNotADouble) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("value", args[1])
-              .build()
-          );
-        }
-
+        sendNotADoubleMessage(sender, args[1]);
         return true;
       }
 
       if (amount <= 0) {
-        if ((message = config.rootSection.playerMessages.argumentIsNotStrictlyPositive) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("value", args[1])
-              .build()
-          );
-        }
-
+        sendNotStrictlyPositiveMessage(sender, args[1]);
         return true;
       }
 
+      // Specified target world-group
       if (args.length >= 3) {
-        if (!PluginPermission.COMMAND_PAY_TARGET.has(player)) {
-          if ((message = config.rootSection.playerMessages.missingPermissionCommandPayTarget) != null)
-            message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
-
+        if (!isPayGroupCommand) {
+          sendUsageMessage(sender, label, false);
           return true;
         }
 
@@ -125,25 +111,25 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       }
 
       else {
-        targetWorldGroup = offlineLocationReader.getLastLocationWorldGroup(targetPlayer);
+        // Target-group is mandatory
+        if (isPayGroupCommand) {
+          sendUsageMessage(sender, label, true);
+          return true;
+        }
+
+        var targetLastLocation = offlineLocationReader.getLastLocation(targetPlayer);
+        targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          if ((message = config.rootSection.playerMessages.notInAnyWorldGroupOther) != null) {
-            message.sendMessage(
-              sender,
-              config.rootSection.getBaseEnvironment()
-                .withStaticVariable("name", targetPlayer.getName())
-                .build()
-            );
-          }
-
+          sendUnknownWorldGroupMessage(targetLastLocation, targetPlayer, sender);
           return true;
         }
       }
 
+      // Specified source world-group
       if (args.length == 4) {
-        if (!PluginPermission.COMMAND_PAY_SOURCE.has(player)) {
-          if ((message = config.rootSection.playerMessages.missingPermissionCommandPaySource) != null)
+        if (!PluginPermission.COMMAND_PAYGROUP_SOURCE.has(player)) {
+          if ((message = config.rootSection.playerMessages.missingPermissionCommandPayGroupSource) != null)
             message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
           return true;
@@ -166,42 +152,18 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       }
 
       else {
-        sourceWorldGroup = offlineLocationReader.getLastLocationWorldGroup(player);
+        var sourceLastLocation = offlineLocationReader.getLastLocation(player);
+        sourceWorldGroup = sourceLastLocation.worldGroup();
 
         if (sourceWorldGroup == null) {
-          if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
-            message.sendMessage(
-              sender,
-              config.rootSection.getBaseEnvironment()
-                .withStaticVariable("current_world", player.getWorld().getName())
-                .build()
-            );
-          }
-
+          sendUnknownWorldGroupMessage(sourceLastLocation, player, sender);
           return true;
         }
       }
     }
 
     else {
-      // /pay <player> <amount> [target] [source]
-      if (PluginPermission.COMMAND_PAY_SOURCE.has(sender))
-        message = config.rootSection.playerMessages.usagePaySourceCommand;
-      else if (PluginPermission.COMMAND_PAY_TARGET.has(sender))
-        message = config.rootSection.playerMessages.usagePayTargetCommand;
-      else
-        message = config.rootSection.playerMessages.usagePayCommand;
-
-      if (message != null) {
-        message.sendMessage(
-          sender,
-          config.rootSection.getBaseEnvironment()
-            .withStaticVariable("label", label)
-            .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
-            .build()
-        );
-      }
-
+      sendUsageMessage(sender, label, isPayGroupCommand);
       return true;
     }
 
@@ -209,19 +171,17 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     var targetAccount = targetAccountRegistry.getAccount(targetPlayer);
 
     if (targetAccount == null) {
-      if ((message = config.rootSection.playerMessages.couldNotLoadAccountOther) != null) {
-        message.sendMessage(
-          sender,
-          config.rootSection.getBaseEnvironment()
-            .withStaticVariable("name", targetPlayer.getName())
-            .build()
-        );
-      }
-
+      sendUnknownAccountMessage(targetWorldGroup, targetPlayer, sender);
       return true;
     }
 
-    if (!sourceWorldGroup.equals(targetWorldGroup) && !PluginPermission.COMMAND_PAY_CROSS.has(player)) {
+    var crossPermission = (
+      isPayGroupCommand
+        ? PluginPermission.COMMAND_PAYGROUP_CROSS
+        : PluginPermission.COMMAND_PAY_CROSS
+    );
+
+    if (!sourceWorldGroup.equals(targetWorldGroup) && !crossPermission.has(player)) {
       if ((message = config.rootSection.playerMessages.cannotPayCrossWorldGroups) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
@@ -232,9 +192,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     var sourceAccount = sourceAccountRegistry.getAccount(player);
 
     if (sourceAccount == null) {
-      if ((message = config.rootSection.playerMessages.couldNotLoadAccountSelf) != null)
-        message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
-
+      sendUnknownAccountMessage(sourceWorldGroup, player, sender);
       return true;
     }
 
@@ -290,13 +248,29 @@ public class PayCommand implements CommandExecutor, TabCompleter {
       .withStaticVariable("receiver_name", targetPlayer.getName())
       .build();
 
-    if ((message = config.rootSection.playerMessages.paymentSentToPlayer) != null)
+    var isSameGroup = targetWorldGroup == sourceWorldGroup;
+
+    message = (
+      isSameGroup
+        ? config.rootSection.playerMessages.paymentSentToPlayerSameGroup
+        : config.rootSection.playerMessages.paymentSentToPlayerDifferentGroup
+    );
+
+    if (message != null)
       message.sendMessage(sender, transactionEnvironment);
 
     Player messageReceiver;
 
-    if ((messageReceiver = targetPlayer.getPlayer()) != null && (message = config.rootSection.playerMessages.paymentReceivedFromPlayer) != null)
-      message.sendMessage(messageReceiver, transactionEnvironment);
+    if ((messageReceiver = targetPlayer.getPlayer()) != null) {
+      message = (
+        isSameGroup
+          ? config.rootSection.playerMessages.paymentReceivedFromPlayerSameGroup
+          : config.rootSection.playerMessages.paymentReceivedFromPlayerDifferentGroup
+      );
+
+      if (message != null)
+        message.sendMessage(messageReceiver, transactionEnvironment);
+    }
 
     return true;
   }
@@ -306,18 +280,52 @@ public class PayCommand implements CommandExecutor, TabCompleter {
     if (!(sender instanceof Player player))
       return List.of();
 
-    if (!PluginPermission.COMMAND_PAY.has(player))
+    var isPayGroupCommand = config.rootSection.commands.payGroup.isLabel(label);
+
+    if (missingCommandPermission(player, isPayGroupCommand))
       return List.of();
 
     if (args.length == 1)
       return offlinePlayerCache.createSuggestions(args[0]);
 
-    if (args.length == 3 && PluginPermission.COMMAND_PAY_TARGET.has(sender))
+    if (!isPayGroupCommand)
+      return List.of();
+
+    if (args.length == 3)
       return worldGroupRegistry.createSuggestions(args[2]);
 
-    if (args.length == 4 && PluginPermission.COMMAND_PAY_SOURCE.has(sender))
+    if (args.length == 4)
       return worldGroupRegistry.createSuggestions(args[3]);
 
     return List.of();
+  }
+
+  private void sendUsageMessage(CommandSender sender, String label, boolean supportsGroups) {
+    BukkitEvaluable message;
+
+    if (supportsGroups)
+      message = config.rootSection.playerMessages.usagePayGroupCommand;
+    else
+      message = config.rootSection.playerMessages.usagePayCommand;
+
+    if (message != null) {
+      message.sendMessage(
+        sender,
+        config.rootSection.getBaseEnvironment()
+          .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
+          .withStaticVariable("label", label)
+          .build()
+      );
+    }
+  }
+
+  private boolean missingCommandPermission(Player sender, boolean isPayGroupCommand) {
+    var commandPermission = (
+      isPayGroupCommand
+        ? PluginPermission.COMMAND_PAYGROUP
+        : PluginPermission.COMMAND_PAY
+    );
+
+    return !commandPermission.has(sender);
   }
 }

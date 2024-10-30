@@ -15,10 +15,13 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable balancesScreen;
 
   public @Nullable BukkitEvaluable playerOnlyBalanceSelfCommand;
+  public @Nullable BukkitEvaluable playerOnlyBalanceGroupSelfCommand;
   public @Nullable BukkitEvaluable missingPermissionBalanceSelfCommand;
   public @Nullable BukkitEvaluable missingPermissionBalanceOtherCommand;
   public @Nullable BukkitEvaluable usageBalanceCommandSelf;
   public @Nullable BukkitEvaluable usageBalanceCommandOther;
+  public @Nullable BukkitEvaluable usageBalanceGroupCommandSelf;
+  public @Nullable BukkitEvaluable usageBalanceGroupCommandOther;
   public @Nullable BukkitEvaluable balanceMessageSelf;
   public @Nullable BukkitEvaluable balanceMessageOther;
 
@@ -27,10 +30,8 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable cannotPaySelf;
   public @Nullable BukkitEvaluable cannotPayCrossWorldGroups;
   public @Nullable BukkitEvaluable usagePayCommand;
-  public @Nullable BukkitEvaluable usagePayTargetCommand;
-  public @Nullable BukkitEvaluable usagePaySourceCommand;
-  public @Nullable BukkitEvaluable missingPermissionCommandPayTarget;
-  public @Nullable BukkitEvaluable missingPermissionCommandPaySource;
+  public @Nullable BukkitEvaluable usagePayGroupCommand;
+  public @Nullable BukkitEvaluable missingPermissionCommandPayGroupSource;
 
   public @Nullable BukkitEvaluable unknownWorldGroup;
   public @Nullable BukkitEvaluable notInAnyWorldGroupSelf;
@@ -41,8 +42,10 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable argumentIsNotStrictlyPositive;
   public @Nullable BukkitEvaluable notEnoughMoneyToPay;
   public @Nullable BukkitEvaluable paymentExceedsReceiversBalance;
-  public @Nullable BukkitEvaluable paymentSentToPlayer;
-  public @Nullable BukkitEvaluable paymentReceivedFromPlayer;
+  public @Nullable BukkitEvaluable paymentSentToPlayerSameGroup;
+  public @Nullable BukkitEvaluable paymentSentToPlayerDifferentGroup;
+  public @Nullable BukkitEvaluable paymentReceivedFromPlayerSameGroup;
+  public @Nullable BukkitEvaluable paymentReceivedFromPlayerDifferentGroup;
 
   public @Nullable BukkitEvaluable missingPermissionMoneyCommand;
   public @Nullable BukkitEvaluable unknownMoneyCommandAction;
