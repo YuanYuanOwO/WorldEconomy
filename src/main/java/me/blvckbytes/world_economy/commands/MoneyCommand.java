@@ -14,14 +14,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class MoneyCommand implements CommandExecutor, TabCompleter {
+public class MoneyCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
   private final OfflinePlayerCache offlinePlayerCache;
   private final EconomyDataRegistry economyDataRegistry;
   private final OfflineLocationReader offlineLocationReader;
   private final WorldGroupRegistry worldGroupRegistry;
   private final WorldEconomyProvider economyProvider;
-  private final ConfigKeeper<MainSection> config;
 
   public MoneyCommand(
     OfflinePlayerCache offlinePlayerCache,
@@ -31,12 +30,13 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
     WorldEconomyProvider economyProvider,
     ConfigKeeper<MainSection> config
   ) {
+    super(config);
+
     this.offlinePlayerCache = offlinePlayerCache;
     this.economyDataRegistry = economyDataRegistry;
     this.offlineLocationReader = offlineLocationReader;
     this.worldGroupRegistry = worldGroupRegistry;
     this.economyProvider = economyProvider;
-    this.config = config;
   }
 
   @Override
@@ -75,28 +75,12 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
       try {
         amount = Double.parseDouble(args[2]);
       } catch (NumberFormatException e) {
-        if ((message = config.rootSection.playerMessages.argumentIsNotADouble) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("value", args[2])
-              .build()
-          );
-        }
-
+        sendNotADoubleMessage(sender, args[2]);
         return true;
       }
 
       if (amount <= 0) {
-        if ((message = config.rootSection.playerMessages.argumentIsNotStrictlyPositive) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("value", args[2])
-              .build()
-          );
-        }
-
+        sendNotStrictlyPositiveMessage(sender, args[2]);
         return true;
       }
 
@@ -108,19 +92,11 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
           return false;
         }
 
-        // TODO: Migrate to latest API-changes
-        targetWorldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
+        var targetLastLocation = offlineLocationReader.getLastLocation(player);
+        targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
-            message.sendMessage(
-              sender,
-              config.rootSection.getBaseEnvironment()
-                .withStaticVariable("current_world", player.getWorld().getName())
-                .build()
-            );
-          }
-
+          sendUnknownWorldGroupMessage(targetLastLocation, player, sender);
           return true;
         }
       }
@@ -162,15 +138,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
     var targetAccount = accountRegistry.getAccount(targetPlayer);
 
     if (targetAccount == null) {
-      if ((message = config.rootSection.playerMessages.couldNotLoadAccountOther) != null) {
-        message.sendMessage(
-          sender,
-          config.rootSection.getBaseEnvironment()
-            .withStaticVariable("name", targetPlayer.getName())
-            .build()
-        );
-      }
-
+      sendUnknownAccountMessage(targetWorldGroup, targetPlayer, sender);
       return true;
     }
 
