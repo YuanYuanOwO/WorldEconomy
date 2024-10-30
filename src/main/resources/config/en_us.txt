@@ -14,7 +14,8 @@ MESSAGE-NOT-IN-ANY-WORLD-GROUP-SELF               {prefix}&cYou're currently not
 # - current_world: String
 MESSAGE-NOT-IN-ANY-WORLD-GROUP-OTHER              {prefix}&cThe player &4{name} &cis currently not within any known world-group (world {current_world}).
 # - name: String
-MESSAGE-UNKNOWN-WORLD-GROUP                       {prefix}&cCould not locate a world-group by the name of &4{name}&c.
+# - world_group_list: String
+MESSAGE-UNKNOWN-WORLD-GROUP                       {prefix}&cThe world-group &4{name} &cis not one of {world_group_list}&c.
 MESSAGE-NO-WORLD-GROUPS                           &cNo world-groups found
 # - value: String
 MESSAGE-VALUE-IS-NOT-A-DOUBLE                     {prefix}&cThe value &4{value} &cis not a valid floating-point number.
@@ -94,6 +95,74 @@ MESSAGE-NOT-ENOUGH-MONEY-TO-PAY-OTHER-GROUP {prefix}&cYour balance of &e{balance
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-THIS-GROUP  {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance.
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-OTHER-GROUP {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance in &e{world_group}&c.
 MESSAGE-MISSING-PERMISSION-PAY-COMMAND                {prefix}&cYou have no permission to use the pay command.
+# - target_old_balance: String
+# - target_new_balance: String
+# - source_old_balance: String
+# - source_new_balance: String
+# - amount: String
+# - target_world_group: String
+# - source_world_group: String
+# - sender_name: String
+# - receiver_name: String
+MESSAGE-PAYGROUP-SENT-TO-PLAYER-THIS-SOURCE                {prefix}&7You have sent &e{amount} &7to &e{receiver_name} &7in &e{target_world_group}&7; new balance: &e{source_new_balance}&7.
+MESSAGE-PAYGROUP-SENT-TO-PLAYER-OTHER-SOURCE               {prefix}&7You have sent &e{amount} &7to &e{receiver_name} &7in &e{target_world_group}&7; new balance in &e{source_world_group}&7: &e{source_new_balance}&7.
+MESSAGE-PAY-SENT-TO-PLAYER-THIS-TARGET                     {prefix}&7You have sent &e{amount} &7to &e{receiver_name}&7; new balance: &e{source_new_balance}&7.
+MESSAGE-PAY-SENT-TO-PLAYER-OTHER-TARGET                    {prefix}&7You have sent &e{amount} &7to &e{receiver_name} &7in &e{target_world_group}&7; new balance: &e{source_new_balance}&7.
+MESSAGE-PAY-RECEIVED-FROM-PLAYER-THIS-SOURCE-THIS-TARGET   {prefix}&7You have received &e{amount} &7from &e{sender_name}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-PAY-RECEIVED-FROM-PLAYER-THIS-SOURCE-OTHER-TARGET  {prefix}&7You have received &e{amount} &7from &e{sender_name}&7; new balance in &e{target_world_group}&7: &e{target_new_balance}&7.
+MESSAGE-PAY-RECEIVED-FROM-PLAYER-OTHER-SOURCE-THIS-TARGET  {prefix}&7You have received &e{amount} &7from &e{sender_name} &7in &e{source_world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-PAY-RECEIVED-FROM-PLAYER-OTHER-SOURCE-OTHER-TARGET {prefix}&7You have received &e{amount} &7from &e{sender_name} &7in &e{source_world_group}&7; new balance in &e{target_world_group}&7: &e{target_new_balance}&7.
+
+# ==================== Money Command ====================
+
+MESSAGE-MISSING-PERMISSION-MONEY-COMMAND {prefix}&cYou have no permission to use the money command.
+# - action_name: String
+MESSAGE-USAGE-MONEY-ACTION-ITEM        &e{action_name}
+MESSAGE-USAGE-MONEY-ACTION-SEPARATOR   &7, \
+# - input: String
+# - action_name_list: String
+MESSAGE-UNKNOWN-MONEY-COMMAND-ACTION   {prefix}&cThe action &4{input} &cis not one of &e{action_name_list}&c.
+# - label: String
+# - action_name_list: String
+# - world_group_list: String
+MESSAGE-USAGE-MONEY-COMMAND                      {prefix}&cUsage: /{label} <{action_name_list}&c> <player> <value> [{world_group_list}&c]
+MESSAGE-PLAYER-ONLY-MONEY-COMMAND-NO-WORLD-GROUP {prefix}&cOnly players can use the money-command without specifying a world-group.
+MESSAGE-MONEY-COMMAND-CONSOLE-NAME               &5Console
+# - target_old_balance: String
+# - amount: String
+# - world_group: String
+# - target_name: String
+# - executor_name: String
+# - balance_max: String
+# - balance_min: String
+MESSAGE-MONEY-ADD-EXCEEDS-RECEIVER-BALANCE    {prefix}&cAdding &e{amount} &cwould exceed &e{target_name}'s &cmaximum balance.
+MESSAGE-MONEY-REMOVE-EXCEEDS-RECEIVER-BALANCE {prefix}&cRemoving &e{amount} &cwould exceed &e{target_name}'s &cminimum balance.
+MESSAGE-MONEY-SET-EXCEEDS-RECEIVER-BALANCE    {prefix}&cSetting to &e{amount} &cwould exceed &e{target_name}'s &cbalance-constraints.
+# - target_new_balance: String
+MESSAGE-MONEY-ADD-EXECUTOR    {prefix}&7Added &a{amount} &7to &e{target_name}'s &7account in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-MONEY-REMOVE-EXECUTOR {prefix}&7Removed &c{amount} &7from &e{target_name}'s &7account in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-MONEY-SET-EXECUTOR    {prefix}&7Set balance of &e{target_name}'s &7account to &e{amount} &7in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-MONEY-ADD-TARGET      {prefix}&e{executor_name} &7has added &a{amount} &7to your account in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-MONEY-REMOVE-TARGET   {prefix}&e{executor_name} &7has removed &c{amount} &7from your account in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+MESSAGE-MONEY-SET-TARGET      {prefix}&e{executor_name} &7has set your account to &e{amount} &7in &e{world_group}&7; new balance: &e{target_new_balance}&7.
+
+# ==================== Baltop Command ====================
+
+MESSAGE-MISSING-PERMISSION-BALTOP-COMMAND              {prefix}&cYou have no permission to use the baltop command.
+MESSAGE-PLAYER-ONLY-BALTOP-COMMAND-NO-WORLD-GROUP      {prefix}&cOnly players can use the baltop-command without specifying a world-group.
+MESSAGE-MISSING-PERMISSION-BALTOP-COMMAND-OTHER-GROUPS {prefix}&cYou have no permission to specify other world-groups on the baltop command.
+# - label: String
+MESSAGE-USAGE-BALTOP-COMMAND                           {prefix}&cUsage: /{label}
+# - label: String
+# - world_group_list: String
+MESSAGE-USAGE-BALTOP-COMMAND-OTHER-GROUPS              {prefix}&cUsage: /{label} [{world_group_list}&c]
+# - world_group: String
+MESSAGE-BALTOP-SCREEN-HEADER                           &7Top balances of &e{world_group}&7:
+# - place: Integer
+# - name: String
+# - balance: String
+MESSAGE-BALTOP-SCREEN-TOP-LINE                         &8- &7#{place} {name}: &e{balance}
+MESSAGE-BALTOP-SCREEN-NO-ENTRIES                       &cNo top-list entries
 
 # ==================== Reload Command ====================
 

@@ -48,10 +48,14 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable notEnoughMoneyToPayOtherGroup;
   public @Nullable BukkitEvaluable paymentExceedsReceiversBalanceThisGroup;
   public @Nullable BukkitEvaluable paymentExceedsReceiversBalanceOtherGroup;
-  public @Nullable BukkitEvaluable paymentSentToPlayerSameGroup;
-  public @Nullable BukkitEvaluable paymentSentToPlayerDifferentGroup;
-  public @Nullable BukkitEvaluable paymentReceivedFromPlayerSameGroup;
-  public @Nullable BukkitEvaluable paymentReceivedFromPlayerDifferentGroup;
+  public @Nullable BukkitEvaluable payGroupSentToPlayerThisSource;
+  public @Nullable BukkitEvaluable payGroupSentToPlayerOtherSource;
+  public @Nullable BukkitEvaluable paySentToPlayerThisTarget;
+  public @Nullable BukkitEvaluable paySentToPlayerOtherTarget;
+  public @Nullable BukkitEvaluable payReceivedFromPlayerThisSourceThisTarget;
+  public @Nullable BukkitEvaluable payReceivedFromPlayerThisSourceOtherTarget;
+  public @Nullable BukkitEvaluable payReceivedFromPlayerOtherSourceThisTarget;
+  public @Nullable BukkitEvaluable payReceivedFromPlayerOtherSourceOtherTarget;
 
   public @Nullable BukkitEvaluable missingPermissionMoneyCommand;
   public @Nullable BukkitEvaluable unknownMoneyCommandAction;
@@ -68,9 +72,9 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable moneyCommandRemoveTarget;
   public @Nullable BukkitEvaluable moneyCommandSetTarget;
 
-  public @Nullable BukkitEvaluable missingPermissionCommandBalTop;
-  public @Nullable BukkitEvaluable playerOnlyBalTopCommandNoWorldGroup;
-  public @Nullable BukkitEvaluable missingPermissionCommandBalTopOtherGroups;
+  public @Nullable BukkitEvaluable missingPermissionBaltopCommand;
+  public @Nullable BukkitEvaluable playerOnlyBaltopCommandNoWorldGroup;
+  public @Nullable BukkitEvaluable missingPermissionBaltopCommandOtherGroups;
   public @Nullable BukkitEvaluable usageBalTopCommand;
   public @Nullable BukkitEvaluable usageBalTopCommandOtherGroups;
   public @Nullable BukkitEvaluable balTopScreen;

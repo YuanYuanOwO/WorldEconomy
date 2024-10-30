@@ -40,7 +40,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
     BukkitEvaluable message;
 
     if (!PluginPermission.COMMAND_BALANCETOP.has(sender)) {
-      if ((message = config.rootSection.playerMessages.missingPermissionCommandBalTop) != null)
+      if ((message = config.rootSection.playerMessages.missingPermissionBaltopCommand) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
@@ -51,7 +51,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
 
     if (args.length == 0) {
       if (!(sender instanceof Player player)) {
-        if ((message = config.rootSection.playerMessages.playerOnlyBalTopCommandNoWorldGroup) != null)
+        if ((message = config.rootSection.playerMessages.playerOnlyBaltopCommandNoWorldGroup) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
@@ -68,7 +68,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
 
     else if (args.length == 1) {
       if (!canSpecifyGroup) {
-        if ((message = config.rootSection.playerMessages.missingPermissionCommandBalTopOtherGroups) != null)
+        if ((message = config.rootSection.playerMessages.missingPermissionBaltopCommandOtherGroups) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
@@ -82,6 +82,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
             sender,
             config.rootSection.getBaseEnvironment()
               .withStaticVariable("name", args[0])
+              .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
               .build()
           );
         }

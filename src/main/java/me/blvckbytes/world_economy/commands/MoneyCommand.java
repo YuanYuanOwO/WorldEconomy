@@ -100,6 +100,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
               sender,
               config.rootSection.getBaseEnvironment()
                 .withStaticVariable("name", args[3])
+                .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
                 .build()
             );
           }

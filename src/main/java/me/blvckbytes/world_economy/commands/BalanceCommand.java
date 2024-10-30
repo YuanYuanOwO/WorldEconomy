@@ -90,6 +90,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
               sender,
               config.rootSection.getBaseEnvironment()
                 .withStaticVariable("name", args[0])
+                .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
                 .build()
             );
           }
@@ -151,7 +152,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
       return true;
     }
 
-    var isThisGroup = sender instanceof Player player && targetWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName());
+    var isThisGroup = sender instanceof Player player && targetWorldGroup.contains(player.getWorld());
 
     message = (
       isSelf

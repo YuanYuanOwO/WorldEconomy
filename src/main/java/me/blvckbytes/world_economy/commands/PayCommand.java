@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -95,6 +96,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
               sender,
               config.rootSection.getBaseEnvironment()
                 .withStaticVariable("name", args[2])
+                .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
                 .build()
             );
           }
@@ -139,6 +141,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
               sender,
               config.rootSection.getBaseEnvironment()
                 .withStaticVariable("name", args[3])
+                .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
                 .build()
             );
           }
@@ -205,7 +208,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     // ========== Transaction Begin ==========
 
     if (!sourceAccount.withdraw(amount)) {
-      if (sourceWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName()))
+      if (sourceWorldGroup.contains(player.getWorld()))
         message = config.rootSection.playerMessages.notEnoughMoneyToPayThisGroup;
       else
         message = config.rootSection.playerMessages.notEnoughMoneyToPayOtherGroup;
@@ -227,7 +230,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     if (!targetAccount.deposit(amount)) {
       sourceAccount.deposit(amount); // Rollback previous withdrawal
 
-      if (targetWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName()))
+      if (targetWorldGroup.contains(player.getWorld()))
         message = config.rootSection.playerMessages.paymentExceedsReceiversBalanceThisGroup;
       else
         message = config.rootSection.playerMessages.paymentExceedsReceiversBalanceOtherGroup;
@@ -255,19 +258,27 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       .withStaticVariable("source_new_balance", economyProvider.format(sourceAccount.getBalance()))
       .withStaticVariable("target_new_balance", economyProvider.format(targetAccount.getBalance()))
       .withStaticVariable("amount", economyProvider.format(amount))
-      .withStaticVariable("target_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
-      .withStaticVariable("source_group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+      .withStaticVariable("target_world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+      .withStaticVariable("source_world_group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
       .withStaticVariable("sender_name", player.getName())
       .withStaticVariable("receiver_name", targetPlayer.getName())
       .build();
 
-    var isSameGroup = targetWorldGroup == sourceWorldGroup;
+    // Target is mandatory, always display; source is optional, display if not this
+    if (isPayGroupCommand) {
+      if (sourceWorldGroup.contains(player.getWorld()))
+        message = config.rootSection.playerMessages.payGroupSentToPlayerThisSource;
+      else
+        message = config.rootSection.playerMessages.payGroupSentToPlayerOtherSource;
+    }
 
-    message = (
-      isSameGroup
-        ? config.rootSection.playerMessages.paymentSentToPlayerSameGroup
-        : config.rootSection.playerMessages.paymentSentToPlayerDifferentGroup
-    );
+    // Source is always this; target is determined automatically, display if not this
+    else {
+      if (targetWorldGroup.contains(player.getWorld()))
+        message = config.rootSection.playerMessages.paySentToPlayerThisTarget;
+      else
+        message = config.rootSection.playerMessages.paySentToPlayerOtherTarget;
+    }
 
     if (message != null)
       message.sendMessage(sender, transactionEnvironment);
@@ -275,11 +286,21 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     Player messageReceiver;
 
     if ((messageReceiver = targetPlayer.getPlayer()) != null) {
-      message = (
-        isSameGroup
-          ? config.rootSection.playerMessages.paymentReceivedFromPlayerSameGroup
-          : config.rootSection.playerMessages.paymentReceivedFromPlayerDifferentGroup
-      );
+      var receiverWorld = messageReceiver.getWorld();
+
+      if (sourceWorldGroup.contains(receiverWorld)) {
+        if (targetWorldGroup.contains(receiverWorld))
+          message = config.rootSection.playerMessages.payReceivedFromPlayerThisSourceThisTarget;
+        else
+          message = config.rootSection.playerMessages.payReceivedFromPlayerThisSourceOtherTarget;
+      }
+
+      else {
+        if (targetWorldGroup.contains(receiverWorld))
+          message = config.rootSection.playerMessages.payReceivedFromPlayerOtherSourceThisTarget;
+        else
+          message = config.rootSection.playerMessages.payReceivedFromPlayerOtherSourceOtherTarget;
+      }
 
       if (message != null)
         message.sendMessage(messageReceiver, transactionEnvironment);

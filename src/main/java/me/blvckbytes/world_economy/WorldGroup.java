@@ -1,6 +1,7 @@
 package me.blvckbytes.world_economy;
 
 import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
+import org.bukkit.World;
 
 import java.util.Objects;
 import java.util.Set;
@@ -10,6 +11,10 @@ public record WorldGroup(
   BukkitEvaluable displayName,
   Set<String> memberWorldNamesLower
 ) {
+  public boolean contains(World world) {
+    return memberWorldNamesLower.contains(world.getName().toLowerCase());
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
