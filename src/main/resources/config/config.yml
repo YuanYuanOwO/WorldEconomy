@@ -43,11 +43,12 @@ commands:
       - bals
 
 worldGroups:
-  # Used to internally identify balances - do not alter once initially established!
+  # Used to internally identify balances, as well as for tab-completion
+  # Do not alter once initially established!
   World:
     # Rendered in chat, whenever this world-group is referred to
     displayName: '&6World'
-    # List of world-names which are coalesced into a single economy-account
+    # List of world-names which are combined into a single economy-account per player
     members:
       - world
       - world_nether
