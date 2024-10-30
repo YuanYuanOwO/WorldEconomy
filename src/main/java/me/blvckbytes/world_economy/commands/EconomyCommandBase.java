@@ -127,7 +127,7 @@ public abstract class EconomyCommandBase {
         sender,
         config.rootSection.getBaseEnvironment()
           .withStaticVariable("name", targetPlayer.getName())
-          .withStaticVariable("group", groupName)
+          .withStaticVariable("world_group", groupName)
           .build()
       );
     }

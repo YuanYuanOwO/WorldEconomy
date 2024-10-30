@@ -91,57 +91,69 @@ economy:
     maximumFractionDigits: 2
 
 playerMessages:
-  missingPermissionBalancesSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to use the balances command."'
-  missingPermissionBalancesOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balances of others."'
-  playerOnlyBalancesSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
-  # label: String
-  usageBalancesCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
-  # label: String
-  usageBalancesCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [player]"'
-  couldNotLoadAccountSelf$: 'lut["MESSAGE_PREFIX"] & "&cCould not load your account."'
+  couldNotLoadAccountSelf$: '@{MESSAGE-COULD-NOT-LOAD-ACCOUNT-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   # name: String
-  couldNotLoadAccountOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &chas not played on this server before."'
+  couldNotLoadAccountOther$: '@{MESSAGE-COULD-NOT-LOAD-ACCOUNT-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
+  # current_world: String
+  notInAnyWorldGroupSelf$: '@{MESSAGE-NOT-IN-ANY-WORLD-GROUP-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  # name: String
+  # current_world: String
+  notInAnyWorldGroupOther$: '@{MESSAGE-NOT-IN-ANY-WORLD-GROUP-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
+  # name: String
+  unknownWorldGroup$: '@{MESSAGE-UNKNOWN-WORLD-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionBalancesCommandSelf$: '@{MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionBalancesCommandOther$: '@{MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
+  playerOnlyBalancesCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCES-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  # label: String
+  usageBalancesCommandSelf$: '@{MESSAGE-USAGE-BALANCES-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  # label: String
+  usageBalancesCommandOther$: '@{MESSAGE-USAGE-BALANCES-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   # - holder: String
   # - balances: Map<String, String>
   # The key of balances represents the display-name of the world-group, the value its corresponding formatted balance
   balancesScreen$: |
     flatten(
       "&8&m                                                  ",
-      "&7Balances of &e" & holder & "&7:",
-      map(balances, (balance) => (
-        "&8- &e" & key(balance) & "&7: &e" & value(balance)
-      ), "&cNo world-groups found"),
+      @{MESSAGE-BALANCES-SCREEN-HEADLINE(prefix=lut["MESSAGE_PREFIX"])},
+      map(balances, (balance_entry) => (
+        @{MESSAGE-BALANCES-SCREEN-WORLD-GROUP-LINE(prefix=lut["MESSAGE_PREFIX"]; world_group=key(balance_entry); balance=value(balance_entry))}
+      ), @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])}),
       "&8&m                                                  "
     )
-  # current_world: String
-  notInAnyWorldGroupSelf$: 'lut["MESSAGE_PREFIX"] & "&cYou''re currently not within any known world-group (world \"" & current_world & "\")."'
-  # name: String
-  # current_world: String
-  notInAnyWorldGroupOther$: 'lut["MESSAGE_PREFIX"] & "&cThe player &4" & name & " &cis currently not within any known world-group (world \"" & current_world & "\")."'
-  # name: String
-  unknownWorldGroup$: 'lut["MESSAGE_PREFIX"] & "&cCould not locate a world-group by the name of &4" & name & "&c."'
   # label: String
-  usageBalanceCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label'
+  usageBalanceCommandSelf$: '@{MESSAGE-USAGE-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
-  usageBalanceCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " [player]"'
+  usageBalanceCommandOther$: '@{MESSAGE-USAGE-BALANCE-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
-  # group_names: String
-  usageBalanceGroupCommandSelf$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c>"'
+  # group_names: List<String>
+  usageBalanceGroupCommandSelf$: |
+    world_group_list = iter_cat(group_names, (group_name) => @{MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM}, @{MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR}, @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])})
+    @{MESSAGE-USAGE-BALANCEGROUP-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}
   # label: String
-  # group_names: String
-  usageBalanceGroupCommandOther$: 'lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <" & iter_cat(group_names, (group_name) => "&e" & group_name, "&7, ") & "&c> [player]"'
+  # group_names: List<String>
+  usageBalanceGroupCommandOther$: |
+    world_group_list = iter_cat(group_names, (group_name) => @{MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM}, @{MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR}, @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])})
+    @{MESSAGE-USAGE-BALANCEGROUP-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}
   # holder: String
   # balance: String
   # group: String
-  balanceMessageSelf$: 'lut["MESSAGE_PREFIX"] & "&7Your balance in &e" & group & " &7is &e" & balance & "&7."'
+  balanceMessageSelfThisGroup$: '@{MESSAGE-BALANCE-SELF-THIS-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
   # holder: String
   # balance: String
   # group: String
-  balanceMessageOther$: 'lut["MESSAGE_PREFIX"] & "&e" & holder & "''s &7balance in &e" & group & " &7is &e" & balance & "&7."'
-  missingPermissionBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to use the balance command."'
-  missingPermissionBalanceOtherCommand$: 'lut["MESSAGE_PREFIX"] & "&cYou do not have permission to view the balance of others."'
-  playerOnlyBalanceSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
-  playerOnlyBalanceGroupSelfCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can view their own balance."'
+  balanceMessageSelfOtherGroup$: '@{MESSAGE-BALANCE-SELF-OTHER-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  # holder: String
+  # balance: String
+  # group: String
+  balanceMessageOtherThisGroup$: '@{MESSAGE-BALANCE-OTHER-THIS-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  # holder: String
+  # balance: String
+  # group: String
+  balanceMessageOtherOtherGroup$: '@{MESSAGE-BALANCE-OTHER-OTHER-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionBalanceCommandSelf$: '@{MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionBalanceCommandOther$: '@{MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
+  playerOnlyBalanceCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  playerOnlyBalanceGroupCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
 
   playerOnlyPayCommand$: 'lut["MESSAGE_PREFIX"] & "&cOnly a player can pay to others."'
   cannotPaySelf$: 'lut["MESSAGE_PREFIX"] & "&cYou cannot pay yourself."'

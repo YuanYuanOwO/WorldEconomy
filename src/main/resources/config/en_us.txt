@@ -2,6 +2,68 @@
 
 MESSAGE-PREFIX                              &7[&6WorldEconomy&7] \
 
+MESSAGE-COULD-NOT-LOAD-ACCOUNT-SELF               {prefix}&cCould not load your account.
+# - name: String
+MESSAGE-COULD-NOT-LOAD-ACCOUNT-OTHER              {prefix}&cThe player &4{name} &chas not played on this server before.
+# - current_world: String
+MESSAGE-NOT-IN-ANY-WORLD-GROUP-SELF               {prefix}&cYou're currently not within any known world-group (world {current_world}).
+# - name: String
+# - current_world: String
+MESSAGE-NOT-IN-ANY-WORLD-GROUP-OTHER              {prefix}&cThe player &4{name} &cis currently not within any known world-group (world {current_world}).
+# - name: String
+MESSAGE-UNKNOWN-WORLD-GROUP                       {prefix}&cCould not locate a world-group by the name of &4{name}&c.
+MESSAGE-NO-WORLD-GROUPS                           &cNo world-groups found
+
+# - group_name: String
+MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM        &e{group_name}
+MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR   &7, \
+
+# - prefix: String
+MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-SELF  {prefix}&cYou do not have permission to use the balances command.
+# - prefix: String
+MESSAGE-MISSING-PERMISSION-BALANCES-COMMAND-OTHER {prefix}&cYou do not have permission to view the balances of others.
+# - prefix: String
+MESSAGE-PLAYER-ONLY-BALANCES-COMMAND-SELF         {prefix}&cOnly a player can view their own balance.
+# - label: String
+# - prefix: String
+MESSAGE-USAGE-BALANCES-COMMAND-SELF               {prefix}&cUsage: /{label}
+# - prefix: String
+MESSAGE-USAGE-BALANCES-COMMAND-OTHER              {prefix}&cUsage: /{label} [player]
+# - prefix: String
+# - holder: String
+MESSAGE-BALANCES-SCREEN-HEADLINE                  &7Balances of &e{holder}&7:
+# - world_group: String
+# - balance: String
+# - prefix: String
+MESSAGE-BALANCES-SCREEN-WORLD-GROUP-LINE          &8- &e{world_group}&7: &e{balance}
+
+# - label: String
+# - prefix: String
+MESSAGE-USAGE-BALANCE-COMMAND-SELF  {prefix}&cUsage: /{label}
+# - label: String
+# - prefix: String
+MESSAGE-USAGE-BALANCE-COMMAND-OTHER {prefix}&cUsage: /{label} [player]
+# - label: String
+# - world_group_list: String
+# - prefix: String
+MESSAGE-USAGE-BALANCEGROUP-COMMAND-SELF  {prefix}&cUsage: /{label} <{world_group_list}&c>
+# - label: String
+# - world_group_list: String
+# - prefix: String
+MESSAGE-USAGE-BALANCEGROUP-COMMAND-OTHER {prefix}&cUsage: /{label} <{world_group_list}&c> [player]
+# - holder: String
+# - balance: String
+# - world_group: String
+# - prefix: String
+MESSAGE-BALANCE-SELF-THIS-GROUP                  {prefix}&7Your balance is &e{balance}&7.
+MESSAGE-BALANCE-SELF-OTHER-GROUP                 {prefix}&7Your balance in &e{world_group} &7is &e{balance}&7.
+MESSAGE-BALANCE-OTHER-THIS-GROUP                 {prefix}&e{holder}'s &7balance &7is &e{balance}&7.
+MESSAGE-BALANCE-OTHER-OTHER-GROUP                {prefix}&e{holder}'s &7balance in &e{world_group} &7is &e{balance}&7.
+MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-SELF  {prefix}&cYou do not have permission to use the balance command.
+MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER {prefix}&cYou do not have permission to view the balance of others.
+MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF         {prefix}&cOnly a player can view their own balance.
+MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF    {prefix}&cOnly a player can view their own balance.
+
 # - prefix: String
 MESSAGE-PLUGIN-RELOAD                       {prefix}&7The plugin has been &ereloaded &7successfully.
 # - prefix: String

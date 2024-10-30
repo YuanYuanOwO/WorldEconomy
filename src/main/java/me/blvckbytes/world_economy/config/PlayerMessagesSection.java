@@ -7,23 +7,25 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerMessagesSection extends AConfigSection {
 
-  public @Nullable BukkitEvaluable playerOnlyBalancesSelfCommand;
-  public @Nullable BukkitEvaluable missingPermissionBalancesSelfCommand;
-  public @Nullable BukkitEvaluable missingPermissionBalancesOtherCommand;
+  public @Nullable BukkitEvaluable playerOnlyBalancesCommandSelf;
+  public @Nullable BukkitEvaluable missingPermissionBalancesCommandSelf;
+  public @Nullable BukkitEvaluable missingPermissionBalancesCommandOther;
   public @Nullable BukkitEvaluable usageBalancesCommandSelf;
   public @Nullable BukkitEvaluable usageBalancesCommandOther;
   public @Nullable BukkitEvaluable balancesScreen;
 
-  public @Nullable BukkitEvaluable playerOnlyBalanceSelfCommand;
-  public @Nullable BukkitEvaluable playerOnlyBalanceGroupSelfCommand;
-  public @Nullable BukkitEvaluable missingPermissionBalanceSelfCommand;
-  public @Nullable BukkitEvaluable missingPermissionBalanceOtherCommand;
+  public @Nullable BukkitEvaluable playerOnlyBalanceCommandSelf;
+  public @Nullable BukkitEvaluable playerOnlyBalanceGroupCommandSelf;
+  public @Nullable BukkitEvaluable missingPermissionBalanceCommandSelf;
+  public @Nullable BukkitEvaluable missingPermissionBalanceCommandOther;
   public @Nullable BukkitEvaluable usageBalanceCommandSelf;
   public @Nullable BukkitEvaluable usageBalanceCommandOther;
   public @Nullable BukkitEvaluable usageBalanceGroupCommandSelf;
   public @Nullable BukkitEvaluable usageBalanceGroupCommandOther;
-  public @Nullable BukkitEvaluable balanceMessageSelf;
-  public @Nullable BukkitEvaluable balanceMessageOther;
+  public @Nullable BukkitEvaluable balanceMessageSelfThisGroup;
+  public @Nullable BukkitEvaluable balanceMessageSelfOtherGroup;
+  public @Nullable BukkitEvaluable balanceMessageOtherThisGroup;
+  public @Nullable BukkitEvaluable balanceMessageOtherOtherGroup;
 
   public @Nullable BukkitEvaluable playerOnlyPayCommand;
   public @Nullable BukkitEvaluable missingPermissionPayCommand;

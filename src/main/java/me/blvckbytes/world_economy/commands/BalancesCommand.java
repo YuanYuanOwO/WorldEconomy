@@ -40,7 +40,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
     BukkitEvaluable message;
 
     if (!PluginPermission.COMMAND_BALANCES.has(sender)) {
-      if ((message = config.rootSection.playerMessages.missingPermissionBalancesSelfCommand) != null)
+      if ((message = config.rootSection.playerMessages.missingPermissionBalancesCommandSelf) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
@@ -52,7 +52,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
 
     if (args.length == 0) {
       if (!(sender instanceof Player player)) {
-        if ((message = config.rootSection.playerMessages.playerOnlyBalancesSelfCommand) != null)
+        if ((message = config.rootSection.playerMessages.playerOnlyBalancesCommandSelf) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
@@ -65,7 +65,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
       targetPlayer = offlinePlayerCache.getByName(args[0]);
 
       if (targetPlayer != sender && !canViewOthers) {
-        if ((message = config.rootSection.playerMessages.missingPermissionBalancesOtherCommand) != null)
+        if ((message = config.rootSection.playerMessages.missingPermissionBalancesCommandOther) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;

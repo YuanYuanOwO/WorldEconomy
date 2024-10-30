@@ -45,7 +45,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
     BukkitEvaluable message;
 
     if (missingCommandPermission(sender, isBalanceGroupCommand)) {
-      if ((message = config.rootSection.playerMessages.missingPermissionBalanceSelfCommand) != null)
+      if ((message = config.rootSection.playerMessages.missingPermissionBalanceCommandSelf) != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
@@ -63,7 +63,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
       }
 
       if (!(sender instanceof Player player)) {
-        if ((message = config.rootSection.playerMessages.playerOnlyBalanceSelfCommand) != null)
+        if ((message = config.rootSection.playerMessages.playerOnlyBalanceCommandSelf) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
         return true;
@@ -103,7 +103,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
 
         else {
           if (!(sender instanceof Player player)) {
-            if ((message = config.rootSection.playerMessages.playerOnlyBalanceGroupSelfCommand) != null)
+            if ((message = config.rootSection.playerMessages.playerOnlyBalanceGroupCommandSelf) != null)
               message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
             return true;
@@ -120,7 +120,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
         }
 
         if (!canViewOthers) {
-          if ((message = config.rootSection.playerMessages.missingPermissionBalanceOtherCommand) != null)
+          if ((message = config.rootSection.playerMessages.missingPermissionBalanceCommandOther) != null)
             message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
           return true;
         }
@@ -151,10 +151,20 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
       return true;
     }
 
+    var isThisGroup = sender instanceof Player player && targetWorldGroup.memberWorldNamesLower().contains(player.getWorld().getName());
+
     message = (
       isSelf
-        ? config.rootSection.playerMessages.balanceMessageSelf
-        : config.rootSection.playerMessages.balanceMessageOther
+        ? (
+          isThisGroup
+            ? config.rootSection.playerMessages.balanceMessageSelfThisGroup
+            : config.rootSection.playerMessages.balanceMessageSelfOtherGroup
+        )
+        : (
+          isThisGroup
+            ? config.rootSection.playerMessages.balanceMessageOtherThisGroup
+            : config.rootSection.playerMessages.balanceMessageOtherOtherGroup
+        )
     );
 
     if (message != null) {
@@ -163,7 +173,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
         config.rootSection.getBaseEnvironment()
           .withStaticVariable("holder", targetPlayer.getName())
           .withStaticVariable("balance", economyProvider.format(targetAccount.getBalance()))
-          .withStaticVariable("group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+          .withStaticVariable("world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
           .build()
       );
     }

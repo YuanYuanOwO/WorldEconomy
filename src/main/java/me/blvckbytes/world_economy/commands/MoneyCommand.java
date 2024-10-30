@@ -146,7 +146,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
     var actionEnvironmentBase = config.rootSection.getBaseEnvironment()
       .withStaticVariable("target_old_balance", economyProvider.format(targetAccount.getBalance()))
       .withStaticVariable("amount", economyProvider.format(amount))
-      .withStaticVariable("group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+      .withStaticVariable("world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
       .withStaticVariable("target_name", targetPlayer.getName())
       .withStaticVariable("executor_name", executorName)
       .withStaticVariable("executor_name", executorName)

@@ -120,7 +120,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
       message.sendMessage(
         sender,
         config.rootSection.getBaseEnvironment()
-          .withStaticVariable("group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+          .withStaticVariable("world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
           .withStaticVariable("entries", entries)
           .build()
       );

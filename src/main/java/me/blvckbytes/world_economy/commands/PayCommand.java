@@ -199,7 +199,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
           config.rootSection.getBaseEnvironment()
             .withStaticVariable("balance", economyProvider.format(sourceAccount.getBalance()))
             .withStaticVariable("amount", economyProvider.format(amount))
-            .withStaticVariable("group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+            .withStaticVariable("world_group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
             .build()
         );
       }
@@ -216,7 +216,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
           config.rootSection.getBaseEnvironment()
             .withStaticVariable("balance", economyProvider.format(targetAccount.getBalance()))
             .withStaticVariable("amount", economyProvider.format(amount))
-            .withStaticVariable("group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
+            .withStaticVariable("world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
             .withStaticVariable("name", targetPlayer.getName())
             .build()
         );
