@@ -14,13 +14,11 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class BalancesCommand implements CommandExecutor, TabCompleter {
+public class BalancesCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
   private final EconomyDataRegistry economyDataRegistry;
-  private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflinePlayerCache offlinePlayerCache;
-  private final ConfigKeeper<MainSection> config;
 
   public BalancesCommand(
     EconomyDataRegistry economyDataRegistry,
@@ -29,11 +27,11 @@ public class BalancesCommand implements CommandExecutor, TabCompleter {
     OfflinePlayerCache offlinePlayerCache,
     ConfigKeeper<MainSection> config
   ) {
+    super(config, economyProvider);
+
     this.economyDataRegistry = economyDataRegistry;
-    this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlinePlayerCache = offlinePlayerCache;
-    this.config = config;
   }
 
   @Override

@@ -14,13 +14,11 @@ import org.bukkit.entity.Player;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class BalanceTopCommand implements CommandExecutor, TabCompleter {
+public class BalanceTopCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
   private final OfflineLocationReader offlineLocationReader;
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
-  private final WorldEconomyProvider economyProvider;
-  private final ConfigKeeper<MainSection> config;
 
   public BalanceTopCommand(
     OfflineLocationReader offlineLocationReader,
@@ -29,11 +27,11 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
     WorldEconomyProvider economyProvider,
     ConfigKeeper<MainSection> config
   ) {
+    super(config, economyProvider);
+
     this.offlineLocationReader = offlineLocationReader;
     this.economyDataRegistry = economyDataRegistry;
     this.worldGroupRegistry = worldGroupRegistry;
-    this.economyProvider = economyProvider;
-    this.config = config;
   }
 
   @Override
@@ -58,22 +56,16 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
         return true;
       }
 
-      // TODO: Migrate to latest API-changes
-      targetWorldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
+      var targetLastLocation = offlineLocationReader.getLastLocation(player);
+      targetWorldGroup = targetLastLocation.worldGroup();
 
       if (targetWorldGroup == null) {
-        if ((message = config.rootSection.playerMessages.notInAnyWorldGroupSelf) != null) {
-          message.sendMessage(
-            sender,
-            config.rootSection.getBaseEnvironment()
-              .withStaticVariable("current_world", player.getWorld().getName())
-              .build()
-          );
-        }
-
+        sendUnknownWorldGroupMessage(targetLastLocation, player, sender);
         return true;
       }
-    } else if (args.length == 1) {
+    }
+
+    else if (args.length == 1) {
       if (!canSpecifyGroup) {
         if ((message = config.rootSection.playerMessages.missingPermissionCommandBalTopOtherGroups) != null)
           message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
@@ -95,7 +87,9 @@ public class BalanceTopCommand implements CommandExecutor, TabCompleter {
 
         return true;
       }
-    } else {
+    }
+
+    else {
       message = (
         canSpecifyGroup
         ? config.rootSection.playerMessages.usageBalTopCommandOtherGroups

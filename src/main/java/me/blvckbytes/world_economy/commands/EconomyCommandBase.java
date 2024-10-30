@@ -85,14 +85,14 @@ public abstract class EconomyCommandBase {
 
     if (targetPlayer == sender) {
       if (lastLocation.worldName() == null)
-        message = config.rootSection.playerMessages.couldNotLoadAccountOther;
-      else
-        message = config.rootSection.playerMessages.notInAnyWorldGroupOther;
-    } else {
-      if (lastLocation.worldName() == null)
         message = config.rootSection.playerMessages.couldNotLoadAccountSelf;
       else
         message = config.rootSection.playerMessages.notInAnyWorldGroupSelf;
+    } else {
+      if (lastLocation.worldName() == null)
+        message = config.rootSection.playerMessages.couldNotLoadAccountOther;
+      else
+        message = config.rootSection.playerMessages.notInAnyWorldGroupOther;
     }
 
     if (message != null) {
