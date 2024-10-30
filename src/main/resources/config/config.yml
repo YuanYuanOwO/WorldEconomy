@@ -57,11 +57,11 @@ economy:
   # Duration in-between writing accounts from memory to their corresponding files
   # Too little gaps will cause needless lag, too large may result in data-loss on unexpected shutdowns
   cacheWritePeriodSeconds: 30
-  # For how long to keep accounts of offline-players in memory
-  offlinePlayerCacheSeconds: 300
+  # How many entries to show at most when viewing top-lists
   topListSize: 5
   nameSingular: 'Euro'
   namePlural: 'Euros'
+  # Balance set to an account whenever it's first created
   startingBalance: 200.0
   # Set to null for no upper bound
   maxMoney: null
