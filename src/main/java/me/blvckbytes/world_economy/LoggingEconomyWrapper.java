@@ -160,7 +160,7 @@ public class LoggingEconomyWrapper implements Economy {
 
   @Override
   public double getBalance(OfflinePlayer player, String worldName) {
-    var result = handle.getBalance(player);
+    var result = handle.getBalance(player, worldName);
     logger.info("Economy::getBalance(" + player.getUniqueId() + ", " + worldName + ") -> " + result);
     return result;
   }
@@ -217,14 +217,14 @@ public class LoggingEconomyWrapper implements Economy {
   @Override
   @SuppressWarnings("deprecation")
   public EconomyResponse withdrawPlayer(String playerName, String worldName, double value) {
-    var result = handle.withdrawPlayer(playerName, value);
+    var result = handle.withdrawPlayer(playerName, worldName, value);
     logger.info("Economy::withdrawPlayer(" + playerName + ", " + worldName + ", " + value + ") -> " + stringifyResponse(result));
     return result;
   }
 
   @Override
   public EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double value) {
-    var result = handle.withdrawPlayer(player, value);
+    var result = handle.withdrawPlayer(player, worldName, value);
     logger.info("Economy::withdrawPlayer(" + player.getUniqueId() + ", " + worldName + ", " + value + ") -> " + stringifyResponse(result));
     return result;
   }
@@ -251,14 +251,14 @@ public class LoggingEconomyWrapper implements Economy {
   @Override
   @SuppressWarnings("deprecation")
   public EconomyResponse depositPlayer(String playerName, String worldName, double value) {
-    var result = handle.depositPlayer(playerName, value);
+    var result = handle.depositPlayer(playerName, worldName, value);
     logger.info("Economy::depositPlayer(" + playerName + ", " + worldName + ", " + value + ") -> " + stringifyResponse(result));
     return result;
   }
 
   @Override
   public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double value) {
-    var result = handle.depositPlayer(player, value);
+    var result = handle.depositPlayer(player, worldName, value);
     logger.info("Economy::depositPlayer(" + player.getUniqueId() + ", " + worldName + ", " + value + ") -> " + stringifyResponse(result));
     return result;
   }
