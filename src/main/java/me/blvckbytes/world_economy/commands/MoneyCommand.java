@@ -20,7 +20,6 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
   private final EconomyDataRegistry economyDataRegistry;
   private final OfflineLocationReader offlineLocationReader;
   private final WorldGroupRegistry worldGroupRegistry;
-  private final WorldEconomyProvider economyProvider;
 
   public MoneyCommand(
     OfflinePlayerCache offlinePlayerCache,
@@ -30,13 +29,12 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
     WorldEconomyProvider economyProvider,
     ConfigKeeper<MainSection> config
   ) {
-    super(config);
+    super(config, economyProvider);
 
     this.offlinePlayerCache = offlinePlayerCache;
     this.economyDataRegistry = economyDataRegistry;
     this.offlineLocationReader = offlineLocationReader;
     this.worldGroupRegistry = worldGroupRegistry;
-    this.economyProvider = economyProvider;
   }
 
   @Override
@@ -52,7 +50,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
 
     MoneyAction action;
     OfflinePlayer targetPlayer;
-    double amount;
+    Double amount;
     WorldGroup targetWorldGroup;
 
     if (args.length == 3 || args.length == 4) {
@@ -72,17 +70,8 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
 
       targetPlayer = offlinePlayerCache.getByName(args[1]);
 
-      try {
-        amount = Double.parseDouble(args[2]);
-      } catch (NumberFormatException e) {
-        sendNotADoubleMessage(sender, args[2]);
+      if ((amount = parseAndValidateValueOrNullAndSendMessage(sender, args[2])) == null)
         return true;
-      }
-
-      if (amount <= 0) {
-        sendNotStrictlyPositiveMessage(sender, args[2]);
-        return true;
-      }
 
       if (args.length == 3) {
         if (!(sender instanceof Player player)) {

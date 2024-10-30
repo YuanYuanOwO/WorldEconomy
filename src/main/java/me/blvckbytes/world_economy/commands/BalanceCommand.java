@@ -17,7 +17,6 @@ import java.util.List;
 public class BalanceCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
   private final EconomyDataRegistry economyDataRegistry;
-  private final WorldEconomyProvider economyProvider;
   private final WorldGroupRegistry worldGroupRegistry;
   private final OfflineLocationReader offlineLocationReader;
   private final OfflinePlayerCache offlinePlayerCache;
@@ -30,10 +29,9 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
     OfflinePlayerCache offlinePlayerCache,
     ConfigKeeper<MainSection> config
   ) {
-    super(config);
+    super(config, economyProvider);
 
     this.economyDataRegistry = economyDataRegistry;
-    this.economyProvider = economyProvider;
     this.worldGroupRegistry = worldGroupRegistry;
     this.offlineLocationReader = offlineLocationReader;
     this.offlinePlayerCache = offlinePlayerCache;

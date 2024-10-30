@@ -16,7 +16,7 @@ public class EconomySection extends AConfigSection {
   public double startingBalance;
   public Double maxMoney;
   public Double minMoney;
-  public @Nullable Double minPayAmount;
+  public @Nullable Double transactionStepSize;
   public boolean doClampOnLoad;
   public long cacheWritePeriodSeconds;
   public long offlinePlayerCacheSeconds;
@@ -48,8 +48,8 @@ public class EconomySection extends AConfigSection {
     if (minMoney != null && maxMoney != null && minMoney > maxMoney)
       throw new MappingError("The minimum amount of money cannot be larger than the maximum amount of money");
 
-    if (minPayAmount != null && minPayAmount < 0 )
-      throw new MappingError("The minimum pay-amount cannot be less than zero");
+    if (transactionStepSize != null && transactionStepSize <= 0)
+      throw new MappingError("The transaction step-size cannot be less than or equal to zero");
 
     if (cacheWritePeriodSeconds < 15)
       throw new MappingError("The cache write period cannot be below 15s, as to not cause needless lag");

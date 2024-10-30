@@ -4,36 +4,69 @@ import me.blvckbytes.bbconfigmapper.ScalarType;
 import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
 import me.blvckbytes.world_economy.OfflineLocationReader;
+import me.blvckbytes.world_economy.WorldEconomyProvider;
 import me.blvckbytes.world_economy.WorldGroup;
 import me.blvckbytes.world_economy.config.MainSection;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class EconomyCommandBase {
 
   protected ConfigKeeper<MainSection> config;
+  protected WorldEconomyProvider economyProvider;
 
-  protected EconomyCommandBase(ConfigKeeper<MainSection> config) {
+  protected EconomyCommandBase(ConfigKeeper<MainSection> config, WorldEconomyProvider economyProvider) {
     this.config = config;
+    this.economyProvider = economyProvider;
   }
 
-  public void sendNotADoubleMessage(CommandSender sender, String value) {
-    BukkitEvaluable message;
+  public @Nullable Double parseAndValidateValueOrNullAndSendMessage(CommandSender sender, String value) {
+    double amount;
 
-    if ((message = config.rootSection.playerMessages.argumentIsNotADouble) != null) {
-      message.sendMessage(
-        sender,
-        config.rootSection.getBaseEnvironment()
-          .withStaticVariable("value", value)
-          .build()
-      );
+    try {
+      amount = Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      sendValueMessage(sender, config.rootSection.playerMessages.valueIsNotADouble, value);
+      return null;
     }
+
+    if (amount <= 0) {
+      sendValueMessage(sender, config.rootSection.playerMessages.valueIsNotStrictlyPositive, value);
+      return null;
+    }
+
+    Double transactionStepSize = config.rootSection.economy.transactionStepSize;
+
+    if (transactionStepSize != null && !isMultipleOf(amount, transactionStepSize)) {
+      BukkitEvaluable message;
+
+      if ((message = config.rootSection.playerMessages.valueIsNotAMultipleOfTransactionStepSize) != null) {
+        message.sendMessage(
+          sender,
+          config.rootSection.getBaseEnvironment()
+            .withStaticVariable("value", value)
+            .withStaticVariable("step_size", economyProvider.format(transactionStepSize))
+            .build()
+        );
+      }
+
+      return null;
+    }
+
+    return amount;
   }
 
-  public void sendNotStrictlyPositiveMessage(CommandSender sender, String value) {
-    BukkitEvaluable message;
+  private boolean isMultipleOf(double value, double step) {
+    if (value < step)
+      return false;
 
-    if ((message = config.rootSection.playerMessages.argumentIsNotStrictlyPositive) != null) {
+    var divisionResult = value / step;
+    return  (divisionResult == (int) Math.floor(divisionResult));
+  }
+
+  private void sendValueMessage(CommandSender sender, @Nullable BukkitEvaluable message, String value) {
+    if (message != null) {
       message.sendMessage(
         sender,
         config.rootSection.getBaseEnvironment()

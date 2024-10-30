@@ -38,8 +38,9 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable notInAnyWorldGroupOther;
   public @Nullable BukkitEvaluable couldNotLoadAccountSelf;
   public @Nullable BukkitEvaluable couldNotLoadAccountOther;
-  public @Nullable BukkitEvaluable argumentIsNotADouble;
-  public @Nullable BukkitEvaluable argumentIsNotStrictlyPositive;
+  public @Nullable BukkitEvaluable valueIsNotADouble;
+  public @Nullable BukkitEvaluable valueIsNotStrictlyPositive;
+  public @Nullable BukkitEvaluable valueIsNotAMultipleOfTransactionStepSize;
   public @Nullable BukkitEvaluable notEnoughMoneyToPay;
   public @Nullable BukkitEvaluable paymentExceedsReceiversBalance;
   public @Nullable BukkitEvaluable paymentSentToPlayerSameGroup;

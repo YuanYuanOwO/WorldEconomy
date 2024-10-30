@@ -69,9 +69,9 @@ economy:
   minMoney: -1000.0
   # Whether to clamp existing accounts to the [min;max]-interval as specified above when loading them
   doClampOnLoad: true
-  # TODO: Actually consider this when executing /pay or /payg or /money
-  # Set to null for no lower bound
-  minPayAmount: .001
+  # Set to null for no constraint
+  # Values transferred using /pay or /money need to be a multiple of this value
+  transactionStepSize: .01
 
   # Set to null to not render
   currencyFormatPrefix: '€ '
@@ -151,8 +151,12 @@ playerMessages:
     lut["MESSAGE_PREFIX"] & "&cUsage: /" & label & " <player> <amount> <target-group: " & names_string & "&c> [source-group: " & names_string & "&c]"
   missingPermissionCommandPayGroupSource$: 'lut["MESSAGE_PREFIX"] & "&cNo permission to specify a custom source world-group."'
   # value: String
-  argumentIsNotADouble$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a valid floating-point number."'
-  argumentIsNotStrictlyPositive$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not strictly positive."'
+  valueIsNotADouble$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a valid floating-point number."'
+  # value: String
+  valueIsNotStrictlyPositive$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not strictly positive."'
+  # value: String
+  # step_size: String
+  valueIsNotAMultipleOfTransactionStepSize$: 'lut["MESSAGE_PREFIX"] & "&cThe value &4" & value & " &cis not a multiple of &4" & step_size & "&c."'
   # balance: String
   # amount: String
   # group: String

@@ -20,7 +20,6 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
   private final OfflineLocationReader offlineLocationReader;
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
-  private final WorldEconomyProvider economyProvider;
 
   public PayCommand(
     OfflinePlayerCache offlinePlayerCache,
@@ -30,7 +29,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     WorldEconomyProvider economyProvider,
     ConfigKeeper<MainSection> config
   ) {
-    super(config);
+    super(config, economyProvider);
 
     this.offlinePlayerCache = offlinePlayerCache;
     this.offlineLocationReader = offlineLocationReader;
@@ -61,7 +60,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     }
 
     OfflinePlayer targetPlayer;
-    double amount;
+    Double amount;
     WorldGroup targetWorldGroup;
     WorldGroup sourceWorldGroup;
 
@@ -75,17 +74,8 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
         return true;
       }
 
-      try {
-        amount = Double.parseDouble(args[1]);
-      } catch (NumberFormatException e) {
-        sendNotADoubleMessage(sender, args[1]);
+      if ((amount = parseAndValidateValueOrNullAndSendMessage(sender, args[1])) == null)
         return true;
-      }
-
-      if (amount <= 0) {
-        sendNotStrictlyPositiveMessage(sender, args[1]);
-        return true;
-      }
 
       // Specified target world-group
       if (args.length >= 3) {
