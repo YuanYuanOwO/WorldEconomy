@@ -135,9 +135,9 @@ MESSAGE-MONEY-COMMAND-CONSOLE-NAME               &5Console
 # - executor_name: String
 # - balance_max: String
 # - balance_min: String
-MESSAGE-MONEY-ADD-EXCEEDS-RECEIVER-BALANCE    {prefix}&cAdding &e{amount} &cwould exceed &e{target_name}'s &cmaximum balance.
-MESSAGE-MONEY-REMOVE-EXCEEDS-RECEIVER-BALANCE {prefix}&cRemoving &e{amount} &cwould exceed &e{target_name}'s &cminimum balance.
-MESSAGE-MONEY-SET-EXCEEDS-RECEIVER-BALANCE    {prefix}&cSetting to &e{amount} &cwould exceed &e{target_name}'s &cbalance-constraints.
+MESSAGE-MONEY-ADD-EXCEEDS-RECEIVER-BALANCE    {prefix}&cAdding &e{amount} &cwould exceed &e{target_name}'s &cmaximum balance in &e{world_group}&c.
+MESSAGE-MONEY-REMOVE-EXCEEDS-RECEIVER-BALANCE {prefix}&cRemoving &e{amount} &cwould exceed &e{target_name}'s &cminimum balance in &e{world_group}&c.
+MESSAGE-MONEY-SET-EXCEEDS-RECEIVER-BALANCE    {prefix}&cSetting to &e{amount} &cwould exceed &e{target_name}'s &cbalance-constraints in &e{world_group}&c.
 # - target_new_balance: String
 MESSAGE-MONEY-ADD-EXECUTOR    {prefix}&7Added &a{amount} &7to &e{target_name}'s &7account in &e{world_group}&7; new balance: &e{target_new_balance}&7.
 MESSAGE-MONEY-REMOVE-EXECUTOR {prefix}&7Removed &c{amount} &7from &e{target_name}'s &7account in &e{world_group}&7; new balance: &e{target_new_balance}&7.

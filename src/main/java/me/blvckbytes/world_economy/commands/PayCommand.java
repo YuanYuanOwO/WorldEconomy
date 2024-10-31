@@ -306,7 +306,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     if (args.length == 3)
       return worldGroupRegistry.createSuggestions(args[2]);
 
-    if (args.length == 4)
+    if (PluginPermission.COMMAND_PAYGROUP_SOURCE.has(sender) && args.length == 4)
       return worldGroupRegistry.createSuggestions(args[3]);
 
     return List.of();

@@ -58,7 +58,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
             sender,
             config.rootSection.getBaseEnvironment()
               .withStaticVariable("input", args[0])
-              .withStaticVariable("actions", MoneyAction.names)
+              .withStaticVariable("actions", MoneyAction.createSuggestions(null))
               .build()
           );
         }
@@ -79,14 +79,11 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
           return false;
         }
 
-        var doResolveLast = config.rootSection.commands.money.resolveTargetLastWorldGroup;
-        var lastLocationTarget = doResolveLast ? targetPlayer : player;
-
-        var targetLastLocation = offlinePlayerHelper.getLastLocation(lastLocationTarget);
+        var targetLastLocation = offlinePlayerHelper.getLastLocation(player);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          sendUnknownWorldGroupMessage(targetLastLocation, lastLocationTarget, sender);
+          sendUnknownWorldGroupMessage(targetLastLocation, player, sender);
           return true;
         }
       }
@@ -116,7 +113,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
           sender,
           config.rootSection.getBaseEnvironment()
             .withStaticVariable("label", label)
-            .withStaticVariable("actions", MoneyAction.names)
+            .withStaticVariable("actions", MoneyAction.createSuggestions(null))
             .withStaticVariable("group_names", worldGroupRegistry.createSuggestions(null))
             .build()
         );
@@ -228,7 +225,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
       return List.of();
 
     if (args.length == 1)
-      return MoneyAction.names;
+      return MoneyAction.createSuggestions(args[0]);
 
     if (args.length == 2)
       return offlinePlayerHelper.createSuggestions(args[1]);

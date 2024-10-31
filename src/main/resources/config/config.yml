@@ -222,14 +222,14 @@ playerMessages:
   # actions: List<String>
   unknownMoneyCommandAction$: |
     action_name_list = iter_cat(actions, (action_name) => @{MESSAGE-USAGE-MONEY-ACTION-ITEM}, @{MESSAGE-USAGE-MONEY-ACTION-SEPARATOR})
-    @{MESSAGE-UNKNOWN-MONEY-COMMAND-ACTION}
+    @{MESSAGE-UNKNOWN-MONEY-COMMAND-ACTION(prefix=lut["MESSAGE_PREFIX"])}
   # label: String
   # actions: List<String>
   # group_names: List<String>
   usageMoneyCommand$: |
     action_name_list = iter_cat(actions, (action_name) => @{MESSAGE-USAGE-MONEY-ACTION-ITEM}, @{MESSAGE-USAGE-MONEY-ACTION-SEPARATOR})
     world_group_list = iter_cat(group_names, (group_name) => @{MESSAGE-USAGE-WORLD-GROUP-LIST-ITEM}, @{MESSAGE-USAGE-WORLD-GROUP-LIST-SEPARATOR}, @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])})
-    @{MESSAGE-USAGE-MONEY-COMMAND}
+    @{MESSAGE-USAGE-MONEY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}
   playerOnlyMoneyCommandNoWorldGroup$: '@{MESSAGE-PLAYER-ONLY-MONEY-COMMAND-NO-WORLD-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
   moneyCommandConsoleName$: '@{MESSAGE-MONEY-COMMAND-CONSOLE-NAME}'
   # target_old_balance: String
