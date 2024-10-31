@@ -17,24 +17,21 @@ import java.util.List;
 
 public class MoneyCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
-  private final OfflinePlayerCache offlinePlayerCache;
+  private final OfflinePlayerHelper offlinePlayerHelper;
   private final EconomyDataRegistry economyDataRegistry;
-  private final OfflineLocationReader offlineLocationReader;
   private final WorldGroupRegistry worldGroupRegistry;
 
   public MoneyCommand(
-    OfflinePlayerCache offlinePlayerCache,
+    OfflinePlayerHelper offlinePlayerHelper,
     EconomyDataRegistry economyDataRegistry,
-    OfflineLocationReader offlineLocationReader,
     WorldGroupRegistry worldGroupRegistry,
     Economy economyProvider,
     ConfigKeeper<MainSection> config
   ) {
     super(config, economyProvider);
 
-    this.offlinePlayerCache = offlinePlayerCache;
+    this.offlinePlayerHelper = offlinePlayerHelper;
     this.economyDataRegistry = economyDataRegistry;
-    this.offlineLocationReader = offlineLocationReader;
     this.worldGroupRegistry = worldGroupRegistry;
   }
 
@@ -69,7 +66,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
         return true;
       }
 
-      targetPlayer = offlinePlayerCache.getByName(args[1]);
+      targetPlayer = offlinePlayerHelper.getByName(args[1]);
 
       if ((amount = parseAndValidateValueOrNullAndSendMessage(sender, args[2])) == null)
         return true;
@@ -85,7 +82,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
         var doResolveLast = config.rootSection.commands.money.resolveTargetLastWorldGroup;
         var lastLocationTarget = doResolveLast ? targetPlayer : player;
 
-        var targetLastLocation = offlineLocationReader.getLastLocation(lastLocationTarget);
+        var targetLastLocation = offlinePlayerHelper.getLastLocation(lastLocationTarget);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
@@ -234,7 +231,7 @@ public class MoneyCommand extends EconomyCommandBase implements CommandExecutor,
       return MoneyAction.names;
 
     if (args.length == 2)
-      return offlinePlayerCache.createSuggestions(args[1]);
+      return offlinePlayerHelper.createSuggestions(args[1]);
 
     if (args.length == 4)
       return worldGroupRegistry.createSuggestions(args[3]);

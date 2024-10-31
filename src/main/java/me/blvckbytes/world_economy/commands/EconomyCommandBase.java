@@ -3,7 +3,7 @@ package me.blvckbytes.world_economy.commands;
 import me.blvckbytes.bbconfigmapper.ScalarType;
 import me.blvckbytes.bukkitevaluable.BukkitEvaluable;
 import me.blvckbytes.bukkitevaluable.ConfigKeeper;
-import me.blvckbytes.world_economy.OfflineLocationReader;
+import me.blvckbytes.world_economy.OfflinePlayerHelper;
 import me.blvckbytes.world_economy.WorldGroup;
 import me.blvckbytes.world_economy.config.MainSection;
 import net.milkbowl.vault.economy.Economy;
@@ -80,7 +80,7 @@ public abstract class EconomyCommandBase {
   }
 
   public void sendUnknownWorldGroupMessage(
-    OfflineLocationReader.LastLocation lastLocation,
+    OfflinePlayerHelper.LastLocation lastLocation,
     OfflinePlayer targetPlayer,
     CommandSender sender
   ) {

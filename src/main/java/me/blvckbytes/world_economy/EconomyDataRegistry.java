@@ -31,8 +31,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
 
   private final Plugin plugin;
   private final File playersFolder;
-  private final OfflineLocationReader offlineLocationReader;
-  private final OfflinePlayerCache offlinePlayerCache;
+  private final OfflinePlayerHelper offlinePlayerHelper;
   private final WorldGroupRegistry worldGroupRegistry;
   private final ConfigKeeper<MainSection> config;
   private final Logger logger;
@@ -41,8 +40,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
 
   public EconomyDataRegistry(
     Plugin plugin,
-    OfflineLocationReader offlineLocationReader,
-    OfflinePlayerCache offlinePlayerCache,
+    OfflinePlayerHelper offlinePlayerHelper,
     WorldGroupRegistry worldGroupRegistry,
     ConfigKeeper<MainSection> config,
     Logger logger
@@ -58,8 +56,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
     }
 
     this.plugin = plugin;
-    this.offlineLocationReader = offlineLocationReader;
-    this.offlinePlayerCache = offlinePlayerCache;
+    this.offlinePlayerHelper = offlinePlayerHelper;
     this.worldGroupRegistry = worldGroupRegistry;
     this.config = config;
     this.logger = logger;
@@ -141,7 +138,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
         continue;
       }
 
-      var holder = offlinePlayerCache.getById(playerId);
+      var holder = offlinePlayerHelper.getById(playerId);
       var playerData = loadPlayerFile(playerFile, holder);
 
       if (playerData == null)
@@ -164,7 +161,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
 
   public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
     synchronized (this) {
-      var worldGroup = offlineLocationReader.getLastLocation(player).worldGroup();
+      var worldGroup = offlinePlayerHelper.getLastLocation(player).worldGroup();
 
       if (worldGroup == null)
         return null;

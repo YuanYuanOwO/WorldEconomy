@@ -19,20 +19,20 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
 
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
-  private final OfflinePlayerCache offlinePlayerCache;
+  private final OfflinePlayerHelper offlinePlayerHelper;
 
   public BalancesCommand(
     EconomyDataRegistry economyDataRegistry,
     Economy economyProvider,
     WorldGroupRegistry worldGroupRegistry,
-    OfflinePlayerCache offlinePlayerCache,
+    OfflinePlayerHelper offlinePlayerHelper,
     ConfigKeeper<MainSection> config
   ) {
     super(config, economyProvider);
 
     this.economyDataRegistry = economyDataRegistry;
     this.worldGroupRegistry = worldGroupRegistry;
-    this.offlinePlayerCache = offlinePlayerCache;
+    this.offlinePlayerHelper = offlinePlayerHelper;
   }
 
   @Override
@@ -62,7 +62,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
     }
 
     else if (args.length == 1) {
-      targetPlayer = offlinePlayerCache.getByName(args[0]);
+      targetPlayer = offlinePlayerHelper.getByName(args[0]);
 
       if (targetPlayer != sender && !canViewOthers) {
         if ((message = config.rootSection.playerMessages.missingPermissionBalancesCommandOther) != null)
@@ -137,7 +137,7 @@ public class BalancesCommand extends EconomyCommandBase implements CommandExecut
   @Override
   public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 1 && PluginPermission.COMMAND_BALANCES_OTHER.has(sender))
-      return offlinePlayerCache.createSuggestions(args[0]);
+      return offlinePlayerHelper.createSuggestions(args[0]);
 
     return List.of();
   }

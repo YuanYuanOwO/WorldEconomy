@@ -12,20 +12,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class PayCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
-  private final OfflinePlayerCache offlinePlayerCache;
-  private final OfflineLocationReader offlineLocationReader;
+  private final OfflinePlayerHelper offlinePlayerHelper;
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
 
   public PayCommand(
-    OfflinePlayerCache offlinePlayerCache,
-    OfflineLocationReader offlineLocationReader,
+    OfflinePlayerHelper offlinePlayerHelper,
     EconomyDataRegistry economyDataRegistry,
     WorldGroupRegistry worldGroupRegistry,
     Economy economyProvider,
@@ -33,8 +30,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
   ) {
     super(config, economyProvider);
 
-    this.offlinePlayerCache = offlinePlayerCache;
-    this.offlineLocationReader = offlineLocationReader;
+    this.offlinePlayerHelper = offlinePlayerHelper;
     this.economyDataRegistry = economyDataRegistry;
     this.worldGroupRegistry = worldGroupRegistry;
     this.economyProvider = economyProvider;
@@ -69,7 +65,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     WorldGroup sourceWorldGroup;
 
     if (args.length == 2 || args.length == 3 || args.length == 4) {
-      targetPlayer = offlinePlayerCache.getByName(args[0]);
+      targetPlayer = offlinePlayerHelper.getByName(args[0]);
 
       if (targetPlayer == sender) {
         if ((message = config.rootSection.playerMessages.cannotPaySelf) != null)
@@ -115,7 +111,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
         var doResolveLast = config.rootSection.commands.pay.resolveTargetLastWorldGroup;
         var lastLocationTarget = doResolveLast ? targetPlayer : player;
 
-        var targetLastLocation = offlineLocationReader.getLastLocation(lastLocationTarget);
+        var targetLastLocation = offlinePlayerHelper.getLastLocation(lastLocationTarget);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
@@ -151,7 +147,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       }
 
       else {
-        var sourceLastLocation = offlineLocationReader.getLastLocation(player);
+        var sourceLastLocation = offlinePlayerHelper.getLastLocation(player);
         sourceWorldGroup = sourceLastLocation.worldGroup();
 
         if (sourceWorldGroup == null) {
@@ -320,7 +316,7 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
       return List.of();
 
     if (args.length == 1)
-      return offlinePlayerCache.createSuggestions(args[0]);
+      return offlinePlayerHelper.createSuggestions(args[0]);
 
     if (!isPayGroupCommand)
       return List.of();

@@ -17,12 +17,12 @@ import java.util.List;
 
 public class BalanceTopCommand extends EconomyCommandBase implements CommandExecutor, TabCompleter {
 
-  private final OfflineLocationReader offlineLocationReader;
+  private final OfflinePlayerHelper offlinePlayerHelper;
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
 
   public BalanceTopCommand(
-    OfflineLocationReader offlineLocationReader,
+    OfflinePlayerHelper offlinePlayerHelper,
     EconomyDataRegistry economyDataRegistry,
     WorldGroupRegistry worldGroupRegistry,
     Economy economyProvider,
@@ -30,7 +30,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
   ) {
     super(config, economyProvider);
 
-    this.offlineLocationReader = offlineLocationReader;
+    this.offlinePlayerHelper = offlinePlayerHelper;
     this.economyDataRegistry = economyDataRegistry;
     this.worldGroupRegistry = worldGroupRegistry;
   }
@@ -57,7 +57,7 @@ public class BalanceTopCommand extends EconomyCommandBase implements CommandExec
         return true;
       }
 
-      var targetLastLocation = offlineLocationReader.getLastLocation(player);
+      var targetLastLocation = offlinePlayerHelper.getLastLocation(player);
       targetWorldGroup = targetLastLocation.worldGroup();
 
       if (targetWorldGroup == null) {

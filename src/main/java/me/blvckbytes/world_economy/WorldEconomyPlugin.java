@@ -34,37 +34,36 @@ public class WorldEconomyPlugin extends JavaPlugin {
       if (!Bukkit.getPluginManager().isPluginEnabled("Vault"))
         throw new IllegalStateException("Expected Vault to be present and enabled");
 
-      var offlinePlayerCache = new OfflinePlayerCache();
-      Bukkit.getServer().getPluginManager().registerEvents(offlinePlayerCache, this);
-
       var worldGroupRegistry = new WorldGroupRegistry(config, logger);
 
-      var offlineLocationReader = new OfflineLocationReader(worldGroupRegistry, config, logger);
-      Bukkit.getServer().getPluginManager().registerEvents(offlineLocationReader, this);
+      var offlinePlayerHelper = new OfflinePlayerHelper(worldGroupRegistry, config, logger);
+      Bukkit.getServer().getPluginManager().registerEvents(offlinePlayerHelper, this);
 
-      economyDataRegistry = new EconomyDataRegistry(this, offlineLocationReader, offlinePlayerCache, worldGroupRegistry, config, logger);
+      Bukkit.getServer().getPluginManager().registerEvents(offlinePlayerHelper, this);
 
-      Economy provider = new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerCache);
+      economyDataRegistry = new EconomyDataRegistry(this, offlinePlayerHelper, worldGroupRegistry, config, logger);
+
+      Economy provider = new WorldEconomyProvider(this, config, economyDataRegistry, offlinePlayerHelper);
 
       if (config.rootSection.economy.logProviderCalls)
         provider = new LoggingEconomyWrapper(provider, logger);
 
       registerProvider(provider);
 
-      var payCommand = new PayCommand(offlinePlayerCache, offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config);
-      var balanceCommand = new BalanceCommand(economyDataRegistry, economyProvider, worldGroupRegistry, offlineLocationReader, offlinePlayerCache, config);
+      var payCommand = new PayCommand(offlinePlayerHelper, economyDataRegistry, worldGroupRegistry, economyProvider, config);
+      var balanceCommand = new BalanceCommand(economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerHelper, config);
 
       setupCommands(config, List.of(
         new Tuple<>(config.rootSection.commands.balance, balanceCommand),
         new Tuple<>(config.rootSection.commands.balanceGroup, balanceCommand),
         new Tuple<>(config.rootSection.commands.balances, new BalancesCommand(
-          economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerCache, config
+          economyDataRegistry, economyProvider, worldGroupRegistry, offlinePlayerHelper, config
         )),
         new Tuple<>(config.rootSection.commands.balanceTop, new BalanceTopCommand(
-          offlineLocationReader, economyDataRegistry, worldGroupRegistry, economyProvider, config
+          offlinePlayerHelper, economyDataRegistry, worldGroupRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.money, new MoneyCommand(
-          offlinePlayerCache, economyDataRegistry, offlineLocationReader, worldGroupRegistry, economyProvider, config
+          offlinePlayerHelper, economyDataRegistry, worldGroupRegistry, economyProvider, config
         )),
         new Tuple<>(config.rootSection.commands.pay, payCommand),
         new Tuple<>(config.rootSection.commands.payGroup, payCommand),

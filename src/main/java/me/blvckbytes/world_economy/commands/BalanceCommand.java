@@ -19,23 +19,20 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
 
   private final EconomyDataRegistry economyDataRegistry;
   private final WorldGroupRegistry worldGroupRegistry;
-  private final OfflineLocationReader offlineLocationReader;
-  private final OfflinePlayerCache offlinePlayerCache;
+  private final OfflinePlayerHelper offlinePlayerHelper;
 
   public BalanceCommand(
     EconomyDataRegistry economyDataRegistry,
     Economy economyProvider,
     WorldGroupRegistry worldGroupRegistry,
-    OfflineLocationReader offlineLocationReader,
-    OfflinePlayerCache offlinePlayerCache,
+    OfflinePlayerHelper offlinePlayerHelper,
     ConfigKeeper<MainSection> config
   ) {
     super(config, economyProvider);
 
     this.economyDataRegistry = economyDataRegistry;
     this.worldGroupRegistry = worldGroupRegistry;
-    this.offlineLocationReader = offlineLocationReader;
-    this.offlinePlayerCache = offlinePlayerCache;
+    this.offlinePlayerHelper = offlinePlayerHelper;
   }
 
   @Override
@@ -71,7 +68,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
 
       targetPlayer = player;
 
-      var targetLastLocation = offlineLocationReader.getLastLocation(targetPlayer);
+      var targetLastLocation = offlinePlayerHelper.getLastLocation(targetPlayer);
       targetWorldGroup = targetLastLocation.worldGroup();
 
       if (targetWorldGroup == null) {
@@ -99,7 +96,7 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
         }
 
         if (args.length == 2) {
-          targetPlayer = offlinePlayerCache.getByName(args[1]);
+          targetPlayer = offlinePlayerHelper.getByName(args[1]);
         }
 
         else {
@@ -126,9 +123,9 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
           return true;
         }
 
-        targetPlayer = offlinePlayerCache.getByName(args[0]);
+        targetPlayer = offlinePlayerHelper.getByName(args[0]);
 
-        var targetLastLocation = offlineLocationReader.getLastLocation(targetPlayer);
+        var targetLastLocation = offlinePlayerHelper.getLastLocation(targetPlayer);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
@@ -198,11 +195,11 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
       if (!canViewOthers)
         return List.of();
 
-      return offlinePlayerCache.createSuggestions(args[0]);
+      return offlinePlayerHelper.createSuggestions(args[0]);
     }
 
     if (args.length == 2 && isBalanceGroupCommand && canViewOthers)
-      return offlinePlayerCache.createSuggestions(args[1]);
+      return offlinePlayerHelper.createSuggestions(args[1]);
 
     return List.of();
   }

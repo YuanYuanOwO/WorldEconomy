@@ -23,18 +23,18 @@ public class WorldEconomyProvider implements Economy {
   private final Plugin plugin;
   private final ConfigKeeper<MainSection> config;
   private final EconomyDataRegistry economyDataRegistry;
-  private final OfflinePlayerCache offlinePlayerCache;
+  private final OfflinePlayerHelper offlinePlayerHelper;
 
   public WorldEconomyProvider(
     Plugin plugin,
     ConfigKeeper<MainSection> config,
     EconomyDataRegistry economyDataRegistry,
-    OfflinePlayerCache offlinePlayerCache
+    OfflinePlayerHelper offlinePlayerHelper
   ) {
     this.plugin = plugin;
     this.config = config;
     this.economyDataRegistry = economyDataRegistry;
-    this.offlinePlayerCache = offlinePlayerCache;
+    this.offlinePlayerHelper = offlinePlayerHelper;
   }
 
   // ================================================================================
@@ -95,7 +95,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean hasAccount(String playerName) {
-    return hasAccount(offlinePlayerCache.getByName(playerName));
+    return hasAccount(offlinePlayerHelper.getByName(playerName));
   }
 
   @Override
@@ -105,7 +105,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean hasAccount(String playerName, String worldName) {
-    return hasAccount(offlinePlayerCache.getByName(playerName), worldName);
+    return hasAccount(offlinePlayerHelper.getByName(playerName), worldName);
   }
 
   @Override
@@ -115,7 +115,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean createPlayerAccount(String playerName) {
-    return createPlayerAccount(offlinePlayerCache.getByName(playerName));
+    return createPlayerAccount(offlinePlayerHelper.getByName(playerName));
   }
 
   @Override
@@ -125,7 +125,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean createPlayerAccount(String playerName, String worldName) {
-    return createPlayerAccount(offlinePlayerCache.getByName(playerName), worldName);
+    return createPlayerAccount(offlinePlayerHelper.getByName(playerName), worldName);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public double getBalance(String playerName) {
-    return getBalance(offlinePlayerCache.getByName(playerName));
+    return getBalance(offlinePlayerHelper.getByName(playerName));
   }
 
   @Override
@@ -150,7 +150,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public double getBalance(String playerName, String worldName) {
-    return getBalance(offlinePlayerCache.getByName(playerName), worldName);
+    return getBalance(offlinePlayerHelper.getByName(playerName), worldName);
   }
 
   @Override
@@ -161,7 +161,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean has(String playerName, double value) {
-    return has(offlinePlayerCache.getByName(playerName), value);
+    return has(offlinePlayerHelper.getByName(playerName), value);
   }
 
   @Override
@@ -172,7 +172,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public boolean has(String playerName, String worldName, double value) {
-    return has(offlinePlayerCache.getByName(playerName), worldName, value);
+    return has(offlinePlayerHelper.getByName(playerName), worldName, value);
   }
 
   @Override
@@ -187,7 +187,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse withdrawPlayer(String playerName, double value) {
-    return withdrawPlayer(offlinePlayerCache.getByName(playerName), value);
+    return withdrawPlayer(offlinePlayerHelper.getByName(playerName), value);
   }
 
   @Override
@@ -197,7 +197,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse withdrawPlayer(String playerName, String worldName, double value) {
-    return withdrawPlayer(offlinePlayerCache.getByName(playerName), worldName, value);
+    return withdrawPlayer(offlinePlayerHelper.getByName(playerName), worldName, value);
   }
 
   @Override
@@ -221,7 +221,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse depositPlayer(String playerName, double value) {
-    return depositPlayer(offlinePlayerCache.getByName(playerName), value);
+    return depositPlayer(offlinePlayerHelper.getByName(playerName), value);
   }
 
   @Override
@@ -231,7 +231,7 @@ public class WorldEconomyProvider implements Economy {
 
   @Override
   public EconomyResponse depositPlayer(String playerName, String worldName, double value) {
-    return depositPlayer(offlinePlayerCache.getByName(playerName), worldName, value);
+    return depositPlayer(offlinePlayerHelper.getByName(playerName), worldName, value);
   }
 
   @Override
