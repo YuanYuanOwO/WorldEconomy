@@ -63,10 +63,12 @@ public class OfflinePlayerHelper implements Listener {
     this.knownPlayerNames = new HashSet<>();
     this.offlinePlayerByLowerName = new WeakHashMap<>();
     this.offlinePlayerLowerNameByUuid = new HashMap<>();
-    this.offlinePlayerById = new HashMap<>();
+    this.offlinePlayerById = new WeakHashMap<>();
 
-    for (var player : Bukkit.getOfflinePlayers())
+    for (var player : Bukkit.getOfflinePlayers()) {
+      offlinePlayerByLowerName.put(player.getName().toLowerCase(), player);
       knownPlayerNames.add(player.getName());
+    }
   }
 
   public LastLocation getLastLocation(OfflinePlayer player) {

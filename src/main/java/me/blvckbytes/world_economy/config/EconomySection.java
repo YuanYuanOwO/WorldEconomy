@@ -57,4 +57,17 @@ public class EconomySection extends AConfigSection {
     if (topListSize <= 0)
       throw new MappingError("The top-list size must be strictly positive");
   }
+
+  public String appendFormatPrefixSuffix(String value) {
+    if (currencyFormatPrefix != null && currencyFormatSuffix != null)
+      return currencyFormatPrefix + value + currencyFormatSuffix;
+
+    if (currencyFormatPrefix != null)
+      return currencyFormatPrefix + value;
+
+    if (currencyFormatSuffix != null)
+      return value + currencyFormatSuffix;
+
+    return value;
+  }
 }

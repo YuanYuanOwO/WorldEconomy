@@ -51,7 +51,12 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
     }
 
     if (missingCommandPermission(player, isPayGroupCommand)) {
-      if ((message = config.rootSection.playerMessages.missingPermissionPayCommand) != null)
+      if (isPayGroupCommand)
+        message = config.rootSection.playerMessages.missingPermissionPayGroupCommand;
+      else
+        message = config.rootSection.playerMessages.missingPermissionPayCommand;
+
+      if (message != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
@@ -108,14 +113,11 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
           return true;
         }
 
-        var doResolveLast = config.rootSection.commands.pay.resolveTargetLastWorldGroup;
-        var lastLocationTarget = doResolveLast ? targetPlayer : player;
-
-        var targetLastLocation = offlinePlayerHelper.getLastLocation(lastLocationTarget);
+        var targetLastLocation = offlinePlayerHelper.getLastLocation(player);
         targetWorldGroup = targetLastLocation.worldGroup();
 
         if (targetWorldGroup == null) {
-          sendUnknownWorldGroupMessage(targetLastLocation, lastLocationTarget, sender);
+          sendUnknownWorldGroupMessage(targetLastLocation, player, sender);
           return true;
         }
       }
@@ -167,26 +169,6 @@ public class PayCommand extends EconomyCommandBase implements CommandExecutor, T
 
     if (targetAccount == null) {
       sendUnknownAccountMessage(targetWorldGroup, targetPlayer, sender);
-      return true;
-    }
-
-    var crossPermission = (
-      isPayGroupCommand
-        ? PluginPermission.COMMAND_PAYGROUP_CROSS
-        : PluginPermission.COMMAND_PAY_CROSS
-    );
-
-    if (!sourceWorldGroup.equals(targetWorldGroup) && !crossPermission.has(player)) {
-      if ((message = config.rootSection.playerMessages.cannotPayCrossWorldGroups) != null) {
-        message.sendMessage(
-          sender,
-          config.rootSection.getBaseEnvironment()
-            .withStaticVariable("source_world_group", sourceWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
-            .withStaticVariable("target_world_group", targetWorldGroup.displayName().asScalar(ScalarType.STRING, config.rootSection.builtBaseEnvironment))
-            .build()
-        );
-      }
-
       return true;
     }
 

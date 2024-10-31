@@ -59,22 +59,20 @@ MESSAGE-USAGE-BALANCEGROUP-COMMAND-OTHER {prefix}&cUsage: /{label} <{world_group
 # - holder: String
 # - balance: String
 # - world_group: String
-MESSAGE-BALANCE-SELF-THIS-GROUP                  {prefix}&7Your balance is &e{balance}&7.
-MESSAGE-BALANCE-SELF-OTHER-GROUP                 {prefix}&7Your balance in &e{world_group} &7is &e{balance}&7.
-MESSAGE-BALANCE-OTHER-THIS-GROUP                 {prefix}&e{holder}'s &7balance &7is &e{balance}&7.
-MESSAGE-BALANCE-OTHER-OTHER-GROUP                {prefix}&e{holder}'s &7balance in &e{world_group} &7is &e{balance}&7.
-MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-SELF  {prefix}&cYou do not have permission to use the balance command.
-MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER {prefix}&cYou do not have permission to view the balance of others.
-MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF         {prefix}&cOnly a player can view their own balance.
-MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF    {prefix}&cOnly a player can view their own balance.
+MESSAGE-BALANCE-SELF-THIS-GROUP                      {prefix}&7Your balance is &e{balance}&7.
+MESSAGE-BALANCE-SELF-OTHER-GROUP                     {prefix}&7Your balance in &e{world_group} &7is &e{balance}&7.
+MESSAGE-BALANCE-OTHER-THIS-GROUP                     {prefix}&e{holder}'s &7balance &7is &e{balance}&7.
+MESSAGE-BALANCE-OTHER-OTHER-GROUP                    {prefix}&e{holder}'s &7balance in &e{world_group} &7is &e{balance}&7.
+MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-SELF      {prefix}&cYou do not have permission to use the balance command.
+MESSAGE-MISSING-PERMISSION-BALANCEGROUP-COMMAND-SELF {prefix}&cYou do not have permission to use the balancegroup command.
+MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER     {prefix}&cYou do not have permission to view the balance of others.
+MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF             {prefix}&cOnly a player can view their own balance.
+MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF        {prefix}&cOnly a player can view their own balance.
 
 # ==================== Pay Command ====================
 
 MESSAGE-PLAYER-ONLY-PAY-COMMAND        {prefix}&cOnly a player can pay to others.
 MESSAGE-CANNOT-PAY-SELF                {prefix}&cYou cannot pay money to yourself.
-# - source_world_group: String
-# - target_world_group: String
-MESSAGE-CANNOT-PAY-CROSS-WORLD-GROUPS  {prefix}&cYou cannot pay to another world-group ({target_world_group}&c) than you're currently in ({source_world_group}&c).
 # - label: String
 MESSAGE-USAGE-PAY-COMMAND              {prefix}&cUsage: /{label} <player> <amount>
 # - label: String
@@ -96,6 +94,7 @@ MESSAGE-NOT-ENOUGH-MONEY-TO-PAY-OTHER-GROUP {prefix}&cYour balance of &e{balance
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-THIS-GROUP  {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance.
 MESSAGE-PAYMENT-EXCEEDS-RECEIVERS-BALANCE-OTHER-GROUP {prefix}&cA payment of &e{amount} &cwould exceed &e{name}'s &cbalance in &e{world_group}&c.
 MESSAGE-MISSING-PERMISSION-PAY-COMMAND                {prefix}&cYou have no permission to use the pay command.
+MESSAGE-MISSING-PERMISSION-PAYGROUP-COMMAND           {prefix}&cYou have no permission to use the paygroup command.
 # - target_old_balance: String
 # - target_new_balance: String
 # - source_old_balance: String

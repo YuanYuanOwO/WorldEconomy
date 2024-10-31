@@ -26,6 +26,7 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable playerOnlyBalanceCommandSelf;
   public @Nullable BukkitEvaluable playerOnlyBalanceGroupCommandSelf;
   public @Nullable BukkitEvaluable missingPermissionBalanceCommandSelf;
+  public @Nullable BukkitEvaluable missingPermissionBalanceGroupCommandSelf;
   public @Nullable BukkitEvaluable missingPermissionBalanceCommandOther;
   public @Nullable BukkitEvaluable usageBalanceCommandSelf;
   public @Nullable BukkitEvaluable usageBalanceCommandOther;
@@ -38,6 +39,7 @@ public class PlayerMessagesSection extends AConfigSection {
 
   public @Nullable BukkitEvaluable playerOnlyPayCommand;
   public @Nullable BukkitEvaluable missingPermissionPayCommand;
+  public @Nullable BukkitEvaluable missingPermissionPayGroupCommand;
   public @Nullable BukkitEvaluable cannotPaySelf;
   public @Nullable BukkitEvaluable cannotPayCrossWorldGroups;
   public @Nullable BukkitEvaluable usagePayCommand;

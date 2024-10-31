@@ -42,7 +42,12 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
     BukkitEvaluable message;
 
     if (missingCommandPermission(sender, isBalanceGroupCommand)) {
-      if ((message = config.rootSection.playerMessages.missingPermissionBalanceCommandSelf) != null)
+      if (isBalanceGroupCommand)
+        message = config.rootSection.playerMessages.missingPermissionBalanceGroupCommandSelf;
+      else
+        message = config.rootSection.playerMessages.missingPermissionBalanceCommandSelf;
+
+      if (message != null)
         message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
 
       return true;
@@ -96,6 +101,12 @@ public class BalanceCommand extends EconomyCommandBase implements CommandExecuto
         }
 
         if (args.length == 2) {
+          if (!canViewOthers) {
+            if ((message = config.rootSection.playerMessages.missingPermissionBalanceCommandOther) != null)
+              message.sendMessage(sender, config.rootSection.builtBaseEnvironment);
+            return true;
+          }
+
           targetPlayer = offlinePlayerHelper.getByName(args[1]);
         }
 

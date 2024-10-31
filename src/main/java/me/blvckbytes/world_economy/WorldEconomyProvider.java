@@ -58,20 +58,7 @@ public class WorldEconomyProvider implements Economy {
   @Override
   public String format(double value) {
     var formattedValue = config.rootSection.economy.currencyFormat.getFormat().format(value);
-
-    String prefix = config.rootSection.economy.currencyFormatPrefix;
-    String suffix = config.rootSection.economy.currencyFormatSuffix;
-
-    if (prefix != null && suffix != null)
-      return prefix + formattedValue + suffix;
-
-    if (prefix != null)
-      return prefix + formattedValue;
-
-    if (suffix != null)
-      return formattedValue + suffix;
-
-    return formattedValue;
+    return config.rootSection.economy.appendFormatPrefixSuffix(formattedValue);
   }
 
   @Override

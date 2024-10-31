@@ -18,4 +18,5 @@ public class MainSection extends AConfigSection {
   public MainSection(EvaluationEnvironmentBuilder baseEnvironment) {
     super(baseEnvironment);
   }
+
 }

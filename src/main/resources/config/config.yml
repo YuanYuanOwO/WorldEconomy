@@ -25,9 +25,6 @@ commands:
     name: money
   pay:
     name: pay
-    # Whether to resolve the target player's last world-group if they're offline
-    # true tries to resolve it, false just uses the same world-group as the sender is in
-    resolveTargetLastWorldGroup: false
   payGroup:
     name: paygroup
     aliases:
@@ -164,14 +161,12 @@ playerMessages:
   # group: String
   balanceMessageOtherOtherGroup$: '@{MESSAGE-BALANCE-OTHER-OTHER-GROUP(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionBalanceCommandSelf$: '@{MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionBalanceGroupCommandSelf$: '@{MESSAGE-MISSING-PERMISSION-BALANCEGROUP-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionBalanceCommandOther$: '@{MESSAGE-MISSING-PERMISSION-BALANCE-COMMAND-OTHER(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyBalanceCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyBalanceGroupCommandSelf$: '@{MESSAGE-PLAYER-ONLY-BALANCEGROUP-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
   playerOnlyPayCommand$: '@{MESSAGE-PLAYER-ONLY-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
   cannotPaySelf$: '@{MESSAGE-CANNOT-PAY-SELF(prefix=lut["MESSAGE_PREFIX"])}'
-  # - source_world_group: String
-  # - target_world_group: String
-  cannotPayCrossWorldGroups$: '@{MESSAGE-CANNOT-PAY-CROSS-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
   usagePayCommand$: '@{MESSAGE-USAGE-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
   # label: String
@@ -221,6 +216,7 @@ playerMessages:
   payReceivedFromPlayerOtherSourceThisTarget$: '@{MESSAGE-PAY-RECEIVED-FROM-PLAYER-OTHER-SOURCE-THIS-TARGET(prefix=lut["MESSAGE_PREFIX"])}'
   payReceivedFromPlayerOtherSourceOtherTarget$: '@{MESSAGE-PAY-RECEIVED-FROM-PLAYER-OTHER-SOURCE-OTHER-TARGET(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionPayCommand$: '@{MESSAGE-MISSING-PERMISSION-PAY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
+  missingPermissionPayGroupCommand$: '@{MESSAGE-MISSING-PERMISSION-PAYGROUP-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
   missingPermissionMoneyCommand$: '@{MESSAGE-MISSING-PERMISSION-MONEY-COMMAND(prefix=lut["MESSAGE_PREFIX"])}'
   # input: String
   # actions: List<String>

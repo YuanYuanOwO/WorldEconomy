@@ -48,7 +48,7 @@ public abstract class EconomyCommandBase {
         message.sendMessage(
           sender,
           config.rootSection.getBaseEnvironment()
-            .withStaticVariable("value", economyProvider.format(amount))
+            .withStaticVariable("value", config.rootSection.economy.appendFormatPrefixSuffix(String.valueOf(amount)))
             .withStaticVariable("step_size", economyProvider.format(transactionStepSize))
             .build()
         );
