@@ -84,7 +84,7 @@ public class WorldEconomyPlugin extends JavaPlugin {
     }
 
     if (economyDataRegistry != null) {
-      economyDataRegistry.writeDirtyAccounts();
+      economyDataRegistry.onShutdown();
       economyDataRegistry = null;
     }
   }

@@ -37,6 +37,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
   private final Logger logger;
 
   private final Map<WorldGroup, EconomyAccountRegistry> accountRegistryByWorldGroup;
+  private boolean isShuttingDown;
 
   public EconomyDataRegistry(
     Plugin plugin,
@@ -69,11 +70,16 @@ public class EconomyDataRegistry implements BalanceConstraint {
     invokeNextWritePeriod();
   }
 
-  private void invokeNextWritePeriod() {
-    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-      writeDirtyAccounts();
-      invokeNextWritePeriod();
-    }, config.rootSection.economy.cacheWritePeriodSeconds * 20);
+  // ================================================================================
+  // Public API
+  // ================================================================================
+
+  public void onShutdown() {
+    synchronized (this) {
+      isShuttingDown = true;
+    }
+
+    writeDirtyAccounts();
   }
 
   public EconomyAccountRegistry getAccountRegistry(WorldGroup worldGroup) {
@@ -81,83 +87,6 @@ public class EconomyDataRegistry implements BalanceConstraint {
       new EconomyAccountRegistry(worldGroup, config, this)
     );
   }
-
-  public void writeDirtyAccounts() {
-    var accountRegistries = accountRegistryByWorldGroup.values();
-
-    for (var accountRegistry : accountRegistries) {
-      for (var account : accountRegistry.getAccounts()) {
-        if (!account.isDirty())
-          continue;
-
-        var accounts = new ArrayList<EconomyAccount>();
-
-        for (var _accountRegistry : accountRegistries) {
-          var _account = _accountRegistry.getAccount(account.holder);
-
-          if (_account == null)
-            continue;
-
-          _account.clearDirty();
-          accounts.add(_account);
-        }
-
-        storePlayerFile(account.holder, accounts);
-      }
-    }
-  }
-
-  private int loadAllFiles() {
-    var playerFiles = playersFolder.listFiles();
-
-    if (playerFiles == null)
-      return 0;
-
-    var loadedPlayerFileCount = 0;
-
-    for (var playerFile : playerFiles) {
-      if (!playerFile.isFile())
-        continue;
-
-      if (!playerFile.getName().endsWith(".json"))
-        continue;
-
-      var fileName = playerFile.getName();
-      var dotIndex = fileName.lastIndexOf('.');
-
-      if (dotIndex < 0)
-        continue;
-
-      var fileNameWithoutExtension = fileName.substring(0, dotIndex);
-
-      UUID playerId;
-
-      try {
-        playerId = UUID.fromString(fileNameWithoutExtension);
-      } catch (Exception e) {
-        continue;
-      }
-
-      var holder = offlinePlayerHelper.getById(playerId);
-      var playerData = loadPlayerFile(playerFile, holder);
-
-      if (playerData == null)
-        continue;
-
-      for (var dataEntry : playerData.entrySet()) {
-        var accountRegistry = getAccountRegistry(dataEntry.getKey());
-        accountRegistry.registerAccount(holder, dataEntry.getValue());
-      }
-
-      ++loadedPlayerFileCount;
-    }
-
-    return loadedPlayerFileCount;
-  }
-
-  // ================================================================================
-  // Public API
-  // ================================================================================
 
   public @Nullable EconomyAccount getForLastWorld(OfflinePlayer player) {
     synchronized (this) {
@@ -214,7 +143,91 @@ public class EconomyDataRegistry implements BalanceConstraint {
   // File-Persistence
   // ================================================================================
 
-  public @Nullable HashMap<WorldGroup, EconomyAccount> loadPlayerFile(File playerFile, OfflinePlayer holder) {
+  private void invokeNextWritePeriod() {
+    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+      writeDirtyAccounts();
+
+      synchronized (this) {
+        if (!isShuttingDown)
+          invokeNextWritePeriod();
+      }
+    }, config.rootSection.economy.cacheWritePeriodSeconds * 20);
+  }
+
+  private int loadAllFiles() {
+    var playerFiles = playersFolder.listFiles();
+
+    if (playerFiles == null)
+      return 0;
+
+    var loadedPlayerFileCount = 0;
+
+    for (var playerFile : playerFiles) {
+      if (!playerFile.isFile())
+        continue;
+
+      if (!playerFile.getName().endsWith(".json"))
+        continue;
+
+      var fileName = playerFile.getName();
+      var dotIndex = fileName.lastIndexOf('.');
+
+      if (dotIndex < 0)
+        continue;
+
+      var fileNameWithoutExtension = fileName.substring(0, dotIndex);
+
+      UUID playerId;
+
+      try {
+        playerId = UUID.fromString(fileNameWithoutExtension);
+      } catch (Exception e) {
+        continue;
+      }
+
+      var holder = offlinePlayerHelper.getById(playerId);
+      var playerData = loadPlayerFile(playerFile, holder);
+
+      if (playerData == null)
+        continue;
+
+      for (var dataEntry : playerData.entrySet()) {
+        var accountRegistry = getAccountRegistry(dataEntry.getKey());
+        accountRegistry.registerAccount(holder, dataEntry.getValue());
+      }
+
+      ++loadedPlayerFileCount;
+    }
+
+    return loadedPlayerFileCount;
+  }
+
+  private void writeDirtyAccounts() {
+    var accountRegistries = accountRegistryByWorldGroup.values();
+
+    for (var accountRegistry : accountRegistries) {
+      for (var account : accountRegistry.getAccounts()) {
+        if (!account.isDirty())
+          continue;
+
+        var holderAccounts = new ArrayList<EconomyAccount>();
+
+        for (var _accountRegistry : accountRegistries) {
+          var _account = _accountRegistry.getAccount(account.holder);
+
+          if (_account == null)
+            continue;
+
+          _account.clearDirty();
+          holderAccounts.add(_account);
+        }
+
+        storePlayerFile(account.holder, holderAccounts);
+      }
+    }
+  }
+
+  private @Nullable HashMap<WorldGroup, EconomyAccount> loadPlayerFile(File playerFile, OfflinePlayer holder) {
     if (!playerFile.isFile())
       return null;
 
@@ -251,7 +264,7 @@ public class EconomyDataRegistry implements BalanceConstraint {
 
       return result;
     } catch (Exception loadException) {
-      logger.log(Level.SEVERE, "Encountered corrupted player-file " + playerFile + "; copying to .bak and deleting", loadException);
+      logger.log(Level.SEVERE, "Encountered corrupted player-file " + playerFile + "; copying to .bak and starting anew", loadException);
 
       try {
         Files.copy(
