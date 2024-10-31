@@ -126,12 +126,12 @@ playerMessages:
   # The key of balances represents the display-name of the world-group, the value its corresponding formatted balance
   balancesScreen$: |
     flatten(
-      "&8&m                                                  ",
+      @{MESSAGE-BALANCES-SCREEN-SPACER},
       @{MESSAGE-BALANCES-SCREEN-HEADLINE(prefix=lut["MESSAGE_PREFIX"])},
       map(balances, (balance_entry) => (
         @{MESSAGE-BALANCES-SCREEN-WORLD-GROUP-LINE(prefix=lut["MESSAGE_PREFIX"]; world_group=key(balance_entry); balance=value(balance_entry))}
       ), @{MESSAGE-NO-WORLD-GROUPS(prefix=lut["MESSAGE_PREFIX"])}),
-      "&8&m                                                  "
+      @{MESSAGE-BALANCES-SCREEN-SPACER}
     )
   # label: String
   usageBalanceCommandSelf$: '@{MESSAGE-USAGE-BALANCE-COMMAND-SELF(prefix=lut["MESSAGE_PREFIX"])}'
@@ -267,12 +267,12 @@ playerMessages:
   # entries: Map<String, String>
   balTopScreen$: |
     flatten(
-      "&8&m                                                  ",
+      @{MESSAGE-BALTOP-SCREEN-SPACER},
       @{MESSAGE-BALTOP-SCREEN-HEADER},
       map(entries, (entry, index) => (
         @{MESSAGE-BALTOP-SCREEN-TOP-LINE(place=index + 1; name=key(entry); balance=value(entry))}
       ), @{MESSAGE-BALTOP-SCREEN-NO-ENTRIES}),
-      "&8&m                                                  "
+      @{MESSAGE-BALTOP-SCREEN-SPACER}
     )
 
   pluginReloadedSuccess$: '@{MESSAGE-PLUGIN-RELOAD(prefix=lut["MESSAGE_PREFIX"])}'

@@ -11,3 +11,6 @@ A highly simplistic, Vault-based economy provider, supporting per-world balances
   - Test all aliases
 - Extract all messages into en_us.txt
 - Ensure that all variable-comments of the config are up-to-date
+
+Write about how offline player last-loc resolving is important for when the EconomyProvider tries to
+withdraw to an offline-player without a given world-string. For commands, behavior is configurable.

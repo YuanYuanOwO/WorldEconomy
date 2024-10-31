@@ -42,6 +42,7 @@ MESSAGE-BALANCES-SCREEN-HEADLINE                  &7Balances of &e{holder}&7:
 # - world_group: String
 # - balance: String
 MESSAGE-BALANCES-SCREEN-WORLD-GROUP-LINE          &8- &e{world_group}&7: &e{balance}
+MESSAGE-BALANCES-SCREEN-SPACER                    &8&m                                                  \
 
 # ==================== Balance Command ====================
 
@@ -163,6 +164,7 @@ MESSAGE-BALTOP-SCREEN-HEADER                           &7Top balances of &e{worl
 # - balance: String
 MESSAGE-BALTOP-SCREEN-TOP-LINE                         &8- &7#{place} {name}: &e{balance}
 MESSAGE-BALTOP-SCREEN-NO-ENTRIES                       &cNo top-list entries
+MESSAGE-BALTOP-SCREEN-SPACER                           &8&m                                                  \
 
 # ==================== Reload Command ====================
 

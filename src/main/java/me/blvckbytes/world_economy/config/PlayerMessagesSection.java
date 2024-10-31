@@ -7,6 +7,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerMessagesSection extends AConfigSection {
 
+  public @Nullable BukkitEvaluable unknownWorldGroup;
+  public @Nullable BukkitEvaluable notInAnyWorldGroupSelf;
+  public @Nullable BukkitEvaluable notInAnyWorldGroupOther;
+  public @Nullable BukkitEvaluable couldNotLoadAccountSelf;
+  public @Nullable BukkitEvaluable couldNotLoadAccountOther;
+  public @Nullable BukkitEvaluable valueIsNotADouble;
+  public @Nullable BukkitEvaluable valueIsNotStrictlyPositive;
+  public @Nullable BukkitEvaluable valueIsNotAMultipleOfTransactionStepSize;
+
   public @Nullable BukkitEvaluable playerOnlyBalancesCommandSelf;
   public @Nullable BukkitEvaluable missingPermissionBalancesCommandSelf;
   public @Nullable BukkitEvaluable missingPermissionBalancesCommandOther;
@@ -35,15 +44,6 @@ public class PlayerMessagesSection extends AConfigSection {
   public @Nullable BukkitEvaluable usagePayGroupCommand;
   public @Nullable BukkitEvaluable usagePayGroupCommandSource;
   public @Nullable BukkitEvaluable missingPermissionCommandPayGroupSource;
-
-  public @Nullable BukkitEvaluable unknownWorldGroup;
-  public @Nullable BukkitEvaluable notInAnyWorldGroupSelf;
-  public @Nullable BukkitEvaluable notInAnyWorldGroupOther;
-  public @Nullable BukkitEvaluable couldNotLoadAccountSelf;
-  public @Nullable BukkitEvaluable couldNotLoadAccountOther;
-  public @Nullable BukkitEvaluable valueIsNotADouble;
-  public @Nullable BukkitEvaluable valueIsNotStrictlyPositive;
-  public @Nullable BukkitEvaluable valueIsNotAMultipleOfTransactionStepSize;
   public @Nullable BukkitEvaluable notEnoughMoneyToPayThisGroup;
   public @Nullable BukkitEvaluable notEnoughMoneyToPayOtherGroup;
   public @Nullable BukkitEvaluable paymentExceedsReceiversBalanceThisGroup;
